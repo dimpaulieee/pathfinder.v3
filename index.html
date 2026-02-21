@@ -519,7 +519,7 @@
         </div>
       </div>
 
-      <!-- Q5 (REVISED: dropdown 50+ courses) -->
+      <!-- Q5 -->
       <div class="question-card" id="question5">
         <div class="question-number">Question 5 of 7</div>
         <h2 class="question-text">Any specific course you’re considering?</h2>
@@ -687,9 +687,9 @@
         <label style="display:flex; gap:10px; align-items:flex-start; margin-top:6px; color: rgba(30,41,59,0.9); font-weight:800;">
           <input type="checkbox" id="includeNearby" onchange="checkLocationComplete()" style="margin-top:4px; width:18px; height:18px;">
           <span>
-            Include nearby / specialized options outside Olongapo (e.g., PRMSU, BPSU, PSAU, PhilSCA Pampanga)
+            Include options outside Olongapo (nearby + Manila big universities)
             <div style="font-weight:650; color: rgba(71,85,105,0.9); font-size:0.9rem; margin-top:6px;">
-              If you want a specialized course that’s stronger outside the city (example: Nursing track in bigger campuses), this helps.
+              Enables nearby/specialized schools (PRMSU/BPSU/PhilSCA) and also Manila options (Big 4).
             </div>
           </span>
         </label>
@@ -746,13 +746,13 @@
 
       <div class="panel">
         <h3><i class="fa-solid fa-school"></i> Schools & Universities (based on your choice)</h3>
-        <p class="muted" id="schoolHint">We prioritize Olongapo. If you enabled “nearby/specialized,” we also add strong nearby options.</p>
+        <p class="muted" id="schoolHint">We prioritize Olongapo. If you enabled “outside Olongapo,” we also add nearby + Manila Big 4 options.</p>
         <ul class="list" id="schoolsList"></ul>
       </div>
 
       <div class="panel">
-        <h3><i class="fa-solid fa-briefcase"></i> Local Opportunities & Why They Fit</h3>
-        <p class="muted" id="companyHint">We’ll show examples of nearby industries and how they match your selected track.</p>
+        <h3><i class="fa-solid fa-briefcase"></i> Opportunities & Why They Fit (All Strands Included)</h3>
+        <p class="muted" id="companyHint">This section always shows options for EVERY strand/direction (Health, Tech, Engineering, Business, Education, Creative, Skilled Trades).</p>
         <ul class="list" id="companiesList"></ul>
       </div>
 
@@ -875,9 +875,10 @@ const courseCatalog = [
 ];
 
 /* -----------------------------
-   DATA: SCHOOLS (Olongapo + nearby)
+   DATA: SCHOOLS (Olongapo + nearby + Manila Big 4)
 --------------------------------*/
 const schoolsDB = [
+  // Olongapo City
   { name:"Gordon College (Olongapo)", city:"Olongapo", area:"Olongapo", type:"Public", nearbyTier:0,
     strengths:["IT","Business","Education","Industrial Tech","TVET ladderized"],
     website:"https://gordoncollege.edu.ph/w3/" },
@@ -888,6 +889,7 @@ const schoolsDB = [
     strengths:["Education","Business","Health-related (varies)","Community programs"],
     website:"https://www.sjc-o.com/" },
 
+  // Near Olongapo / Region III
   { name:"The Manila Times College of Subic", city:"Subic Bay Freeport Zone", area:"Near Olongapo", type:"Private", nearbyTier:1,
     strengths:["Communication/Media","Business","Work-based learning"],
     website:"https://tmtc.edu.ph/" },
@@ -898,47 +900,99 @@ const schoolsDB = [
   { name:"President Ramon Magsaysay State University (PRMSU)", city:"Zambales", area:"Nearby (Zambales)", type:"Public SUC", nearbyTier:2,
     strengths:["Engineering","Education","IT","Agriculture/Environment (varies by campus)"],
     website:"https://www.prmsu.edu.ph/" },
-
   { name:"Bataan Peninsula State University (BPSU)", city:"Bataan", area:"Nearby (Bataan)", type:"Public SUC", nearbyTier:2,
     strengths:["Engineering","IT","Business","Education (varies by campus)"],
     website:"https://www.bpsu.edu.ph/" },
-
-  { name:"Pampanga State Agricultural University (PSAU)", city:"Magalang, Pampanga", area:"Nearby (Pampanga)", type:"Public SUC", nearbyTier:3,
-    strengths:["Agri-related","Engineering/Tech (varies)","Business (varies)"],
-    website:"https://psau.edu.ph/" },
-
   { name:"Philippine State College of Aeronautics (PhilSCA) – Basa Campus (Pampanga)", city:"Floridablanca, Pampanga", area:"Specialized (Aviation)", type:"Public", nearbyTier:3,
     strengths:["Aviation","Aeronautics-related","Technical programs (varies)"],
     website:"https://www.philsca.edu.ph/" },
+
+  // Manila "Big 4" (only shown when "outside Olongapo" is enabled)
+  { name:"University of the Philippines (UP) – System", city:"Metro Manila", area:"Manila (Big 4)", type:"Public", nearbyTier:4,
+    strengths:["Engineering","Health","Tech","Business","Education","Creative","Sciences"],
+    website:"https://up.edu.ph/" },
+  { name:"Ateneo de Manila University", city:"Quezon City", area:"Manila (Big 4)", type:"Private", nearbyTier:4,
+    strengths:["Business","Tech","Education","Social Sciences","Communication/Creative"],
+    website:"https://www.ateneo.edu/" },
+  { name:"De La Salle University", city:"Manila", area:"Manila (Big 4)", type:"Private", nearbyTier:4,
+    strengths:["Engineering","Tech","Business","Sciences (varies)"],
+    website:"https://www.dlsu.edu.ph/" },
+  { name:"University of Santo Tomas (UST)", city:"Manila", area:"Manila (Big 4)", type:"Private", nearbyTier:4,
+    strengths:["Health","Business","Engineering","Education","Creative (varies)"],
+    website:"https://www.ust.edu.ph/" },
 ];
 
 /* -----------------------------
-   DATA: COMPANIES / INDUSTRIES (Olongapo + Subic area)
+   DATA: OPPORTUNITIES (must include ALL directions)
+   We will always render 1 item per direction, plus a couple extras that fit the user.
 --------------------------------*/
-const industryDB = [
+const opportunitiesByDirection = [
   {
-    name:"Subic Bay Metropolitan Authority (SBMA) locators",
-    fitTags:["Business","IT","Engineering","SkilledTrades","WorkBased","Practical"],
-    why:"Subic Freeport hosts diverse locators (logistics, services, industrial). Good for internships, operations, and technical roles.",
+    direction:"Health",
+    icon:"fa-stethoscope",
+    name:"Hospitals/Clinics + Community Health (Olongapo–Subic area)",
+    why:"Best for Nursing/MedTech/Pharmacy pathways: clinical exposure, community programs, patient-care practice (always verify required hours/requirements).",
+    link:""
+  },
+  {
+    direction:"Tech",
+    icon:"fa-laptop-code",
+    name:"IT Support / Networks / Web (SBMA locators & local businesses)",
+    why:"Good for IT/CS: helpdesk, networking basics, web maintenance—build portfolio + certifications while studying.",
     link:"https://sbma.com/"
   },
   {
-    name:"Agila Subic Shipyard (formerly Hanjin Subic Shipyard area)",
-    fitTags:["Engineering","SkilledTrades","WorkBased","HandsOn","Practical","HighIncome"],
-    why:"Shipyard/industrial ecosystem: fabrication, electrical, mechanical maintenance, QA/QC, safety roles and technical trades.",
+    direction:"Engineering",
+    icon:"fa-helmet-safety",
+    name:"Shipyard / Industrial Maintenance Ecosystem (Subic)",
+    why:"Great for Engineering & hands-on learners: electrical/mechanical maintenance, fabrication, QA/QC, safety roles.",
     link:"https://www.agilasubic.com/"
   },
   {
+    direction:"Business",
+    icon:"fa-briefcase",
+    name:"Operations / Logistics / Finance Support (Freeport + local SMEs)",
+    why:"For ABM/Business: admin, inventory, basic accounting support, procurement—strong internship potential near Subic.",
+    link:"https://sbma.com/"
+  },
+  {
+    direction:"Education",
+    icon:"fa-chalkboard-user",
+    name:"Schools / Tutorials / Youth Programs (Local community)",
+    why:"For Education: tutoring, assistant roles, education org volunteering—build teaching confidence + experience.",
+    link:""
+  },
+  {
+    direction:"Creative",
+    icon:"fa-palette",
+    name:"Media/Design Gigs + Student Publication Work (Local + Online)",
+    why:"For Creative/HUMSS: content writing, layout/design, video edits—portfolio-first pathway with real outputs.",
+    link:""
+  },
+  {
+    direction:"SkilledTrades",
+    icon:"fa-industry",
+    name:"TESDA + Trade Work (Electrical/Welding/Automotive/RAC)",
+    why:"Fast track for TVL: NC II/III + OJT = quicker employability; strong fit for hands-on preference.",
+    link:""
+  },
+];
+
+// Optional extras (shown depending on user choices)
+const extrasDB = [
+  {
+    fitDirections:["Engineering","SkilledTrades"],
+    icon:"fa-ship",
     name:"Austal Philippines (shipbuilding / sustainment)",
-    fitTags:["Engineering","SkilledTrades","WorkBased","HandsOn","HighIncome"],
-    why:"Shipbuilding & maintenance work supports technical trades and engineering support roles; good for hands-on learners.",
+    why:"Shipbuilding & maintenance work supports trades and engineering support roles; strong hands-on environment.",
     link:"https://www.austal.com/philippines"
   },
   {
-    name:"Hospital / Clinic Ecosystem (Olongapo–Subic area)",
-    fitTags:["Health","Practical","Academic","Mixed","HighIncome"],
-    why:"Health tracks align with hospitals/clinics and community health programs. Great for Nursing and allied health pathways (verify school offerings).",
-    link:""
+    fitDirections:["Tech","Business"],
+    icon:"fa-building",
+    name:"SBMA locators (services, logistics, BPO/operations)",
+    why:"Wide variety of roles—from operations and finance support to IT and admin paths.",
+    link:"https://sbma.com/"
   }
 ];
 
@@ -990,7 +1044,7 @@ function updateProgressBar(){
 
 function saveSelectedCourse(){
   const v = document.getElementById('courseSelect').value;
-  answers.typedCourse = (v || "").trim(); // reuse the same variable name to keep logic intact
+  answers.typedCourse = (v || "").trim();
 }
 
 function checkLocationComplete(){
@@ -1104,39 +1158,42 @@ function pickTopCourses(){
     }
   }
 
-  const scored = courseCatalog
+  return courseCatalog
     .map(c => ({...c, _score: computeCourseScore(c)}))
-    .sort((a,b)=> b._score - a._score);
-
-  return scored.slice(0,3);
+    .sort((a,b)=> b._score - a._score)
+    .slice(0,3);
 }
 
-function computeSchoolScore(school, topCourses, includeNearby){
+function computeSchoolScore(school, topCourses, includeOutside){
   const priority = answers.q3 || "";
   const direction = answers.q2 || "";
   const typedMode = answers.q5 || "NoSpecific";
   const typed = normalizeText(answers.typedCourse || "");
   let score = 0;
 
-  if(!includeNearby && school.nearbyTier > 0) return -9999;
+  // only show outside schools (tiers > 0) if includeOutside is checked
+  if(!includeOutside && school.nearbyTier > 0) return -9999;
 
-  score += (school.nearbyTier === 0) ? 30 : (school.nearbyTier === 1 ? 18 : (includeNearby ? 10 : 0));
+  // base preference: Olongapo first, then near, then manila
+  score += (school.nearbyTier === 0) ? 34 : (school.nearbyTier === 1 ? 22 : (school.nearbyTier === 2 ? 14 : (school.nearbyTier === 3 ? 12 : 10)));
 
+  // Match strengths to top courses (simple)
   const courseNames = topCourses.map(c=>normalizeText(c.id));
   const strengths = school.strengths.map(s=>normalizeText(s));
   courseNames.forEach(name=>{
-    if(strengths.some(st => st.includes(name.split(" ")[0]))) score += 14;
+    const key = name.split(" ")[0];
+    if(strengths.some(st => st.includes(key))) score += 14;
   });
 
-  if(direction === "Health" && strengths.some(s=>s.includes("nurs") || s.includes("health"))) score += 12;
-  if(direction === "Tech" && strengths.some(s=>s.includes("it") || s.includes("cs"))) score += 12;
-  if(direction === "Engineering" && strengths.some(s=>s.includes("eng") || s.includes("avi"))) score += 12;
-  if(direction === "Business" && strengths.some(s=>s.includes("bus") || s.includes("account"))) score += 12;
-  if(direction === "Education" && strengths.some(s=>s.includes("educ"))) score += 12;
-  if(direction === "Creative" && strengths.some(s=>s.includes("comm") || s.includes("arts"))) score += 12;
-  if(direction === "SkilledTrades" && strengths.some(s=>s.includes("tvet") || s.includes("industrial"))) score += 12;
+  // Direction alignment
+  if(direction === "Health" && strengths.some(s=>s.includes("health") || s.includes("nurs"))) score += 12;
+  if(direction === "Tech" && strengths.some(s=>s.includes("tech") || s.includes("it") || s.includes("cs"))) score += 12;
+  if(direction === "Engineering" && strengths.some(s=>s.includes("engineering") || s.includes("aviation"))) score += 12;
+  if(direction === "Business" && strengths.some(s=>s.includes("business") || s.includes("account"))) score += 12;
+  if(direction === "Education" && strengths.some(s=>s.includes("education"))) score += 12;
+  if(direction === "Creative" && strengths.some(s=>s.includes("creative") || s.includes("comm"))) score += 12;
 
-  if(priority === "FastTrack" && strengths.some(s=>s.includes("tvet") || s.includes("industrial"))) score += 10;
+  if(priority === "FastTrack" && strengths.some(s=>s.includes("industrial") || s.includes("tvet"))) score += 10;
 
   if(typedMode === "HasSpecific" && typed.length >= 2){
     const hay = normalizeText(school.name + " " + school.strengths.join(" "));
@@ -1147,36 +1204,46 @@ function computeSchoolScore(school, topCourses, includeNearby){
 }
 
 function pickSchools(topCourses){
-  const includeNearby = document.getElementById('includeNearby').checked;
+  const includeOutside = document.getElementById('includeNearby').checked;
+
+  // If outside is enabled, allow up to 12 (so Big 4 can appear too)
+  const limit = includeOutside ? 12 : 10;
+
   return schoolsDB
-    .map(s => ({...s, _score: computeSchoolScore(s, topCourses, includeNearby)}))
+    .map(s => ({...s, _score: computeSchoolScore(s, topCourses, includeOutside)}))
     .filter(s => s._score > -1000)
     .sort((a,b)=> b._score - a._score)
-    .slice(0, 10);
+    .slice(0, limit);
 }
 
-function computeCompanyScore(item, topCourses){
+/* -----------------------------
+   OPPORTUNITIES: ALWAYS INCLUDE ALL DIRECTIONS
+--------------------------------*/
+function buildOpportunities(topCourses){
   const direction = answers.q2 || "";
   const style = answers.q4 || "";
   const priority = answers.q3 || "";
-  let score = 0;
+  const mode = answers.q7 || "TopCourses";
 
-  if(item.fitTags.includes(direction)) score += 18;
-  if(item.fitTags.includes(style)) score += 10;
-  if(item.fitTags.includes(priority)) score += 10;
+  // Base list: 1 per direction (always)
+  const base = opportunitiesByDirection.map(x => ({...x}));
 
-  const topHasTrades = topCourses.some(c=>c.tags.includes("SkilledTrades"));
-  const topHasEng = topCourses.some(c=>c.tags.includes("Engineering"));
-  if((topHasTrades || topHasEng) && item.name.toLowerCase().includes("shipyard")) score += 10;
+  // Add 1-2 extras if relevant (mode WorkAndSkills shows more)
+  const extras = extrasDB
+    .filter(e => (e.fitDirections || []).includes(direction) || (e.fitDirections || []).includes(getMainCategory(topCourses[0]?.tags || [])))
+    .slice(0, (mode === "WorkAndSkills") ? 2 : 1)
+    .map(e => ({ direction:"Extra", icon:e.icon, name:e.name, why:e.why, link:e.link }));
 
-  return score;
-}
+  // A small "why based on you" note per base item (without changing the guaranteed coverage)
+  base.forEach(item=>{
+    let add = [];
+    if(item.direction === direction) add.push("matches your chosen direction");
+    if(priority && item.why.toLowerCase().includes("fast")) add.push("fits fast-track preference");
+    if(style && (style === "HandsOn" || style === "WorkBased") && item.why.toLowerCase().includes("hands")) add.push("fits hands-on/work-based learning");
+    if(add.length) item.why = item.why + " (" + add.join(", ") + ").";
+  });
 
-function pickCompanies(topCourses){
-  return industryDB
-    .map(x => ({...x, _score: computeCompanyScore(x, topCourses)}))
-    .sort((a,b)=> b._score - a._score)
-    .slice(0, 5);
+  return [...base, ...extras];
 }
 
 /* -----------------------------
@@ -1194,15 +1261,15 @@ function generateRoadmap(){
   document.getElementById('quizSection').style.display = 'none';
   document.getElementById('resultSection').style.display = 'block';
 
-  const includeNearby = document.getElementById('includeNearby').checked;
+  const includeOutside = document.getElementById('includeNearby').checked;
 
   document.getElementById('resultSubtitle').textContent =
-    includeNearby ? `Personalized for ${barangay}, Olongapo (with nearby/specialized options)` : `Personalized for ${barangay}, Olongapo City`;
+    includeOutside ? `Personalized for ${barangay}, Olongapo (with outside options incl. Manila Big 4)` : `Personalized for ${barangay}, Olongapo City`;
 
   const topCourses = pickTopCourses();
   renderCourses(topCourses);
   renderSchools(pickSchools(topCourses), topCourses);
-  renderCompanies(pickCompanies(topCourses), topCourses);
+  renderOpportunities(buildOpportunities(topCourses));
 }
 
 function renderCourses(topCourses){
@@ -1214,7 +1281,7 @@ function renderCourses(topCourses){
 
   const summary = `
     ${typedMode === "HasSpecific" && typed
-      ? `You selected <strong>${typed}</strong>, so we kept your recommendations <strong>aligned to that track</strong> (no random shifting).`
+      ? `You selected <strong>${typed}</strong>, so recommendations stay <strong>aligned to that track</strong> (no random shifting).`
       : `Based on your answers, your best matches balance <strong>${direction || "your direction"}</strong>,
          <strong>${priority || "your priority"}</strong>, and a <strong>${style || "learning style"}</strong> approach.`
     }
@@ -1251,12 +1318,17 @@ function renderSchools(schools, topCourses){
   list.innerHTML = "";
 
   const mode = answers.q7 || "TopCourses";
-  const maxItems = (mode === "SchoolOptions") ? 12 : 10;
+  const maxItems = (mode === "SchoolOptions") ? 12 : schools.length;
   const shown = schools.slice(0, maxItems);
 
   shown.forEach(s=>{
     const li = document.createElement('li');
-    const tierLabel = s.nearbyTier === 0 ? "Olongapo" : (s.nearbyTier === 1 ? "Near Olongapo" : "Nearby/Specialized");
+    const tierLabel =
+      s.nearbyTier === 0 ? "Olongapo" :
+      s.nearbyTier === 1 ? "Near Olongapo" :
+      s.nearbyTier === 4 ? "Manila (Big 4)" :
+      "Outside Olongapo";
+
     const strengths = s.strengths.join(", ");
 
     const linkPart = s.website
@@ -1271,7 +1343,7 @@ function renderSchools(schools, topCourses){
         <div>
           <div style="font-weight:950; color:#111827;">${s.name}</div>
           <div class="muted"><strong>Area:</strong> ${tierLabel} • <strong>Type:</strong> ${s.type}</div>
-          <div class="muted"><strong>Why it fits:</strong> Offers strengths aligned to your tracks (e.g., ${strengths}).</div>
+          <div class="muted"><strong>Why it fits:</strong> Strengths aligned to your tracks (e.g., ${strengths}).</div>
           ${linkPart}
         </div>
       </div>
@@ -1280,24 +1352,27 @@ function renderSchools(schools, topCourses){
   });
 }
 
-function renderCompanies(companies, topCourses){
+function renderOpportunities(items){
   const list = document.getElementById('companiesList');
   list.innerHTML = "";
 
   const mode = answers.q7 || "TopCourses";
-  const maxItems = (mode === "WorkAndSkills") ? 6 : 4;
-  companies.slice(0, maxItems).forEach(c=>{
+  const maxItems = (mode === "WorkAndSkills") ? 10 : 9; // 7 guaranteed + up to 2 extras
+  items.slice(0, maxItems).forEach(c=>{
     const li = document.createElement('li');
-    const link = c.link ? `<a href="${c.link}" target="_blank" rel="noopener">Official/Reference link</a>` : `<span class="muted"><em>Link not included</em></span>`;
+    const link = c.link
+      ? `<a href="${c.link}" target="_blank" rel="noopener">Official/Reference link</a>`
+      : `<span class="muted"><em>Link not included</em></span>`;
 
     li.innerHTML = `
       <div style="display:flex; gap:10px;">
         <div style="min-width:28px; display:flex; justify-content:center; padding-top:2px;">
-          <i class="fa-solid fa-building" style="color:#be185d;"></i>
+          <i class="fa-solid ${c.icon || 'fa-briefcase'}" style="color:#be185d;"></i>
         </div>
         <div>
           <div style="font-weight:950; color:#111827;">${c.name}</div>
-          <div class="muted"><strong>Why it matches your inputs:</strong> ${c.why}</div>
+          <div class="muted"><strong>Category:</strong> ${c.direction}</div>
+          <div class="muted"><strong>Why it fits:</strong> ${c.why}</div>
           <div class="muted" style="margin-top:6px;">${link}</div>
         </div>
       </div>
