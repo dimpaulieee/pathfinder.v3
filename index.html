@@ -1,2287 +1,1220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PATHFINDER - Your College & Career Sidekick</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a0b2e 0%, #2d0b3a 100%);
-            min-height: 100vh;
-            padding: 15px;
-            overflow-x: hidden;
-        }
-        
-        /* Simple static background */
-        .bg-shapes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.1;
-        }
-        
-        .shape {
-            position: absolute;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
-        }
-        
-        .shape:nth-child(1) {
-            width: 200px;
-            height: 200px;
-            top: 10%;
-            left: 5%;
-        }
-        
-        .shape:nth-child(2) {
-            width: 150px;
-            height: 150px;
-            background: linear-gradient(135deg, #c084fc, #d8b4fe);
-            bottom: 10%;
-            right: 5%;
-        }
-        
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 
-                0 10px 30px rgba(190, 24, 93, 0.2),
-                0 0 50px rgba(236, 72, 153, 0.1);
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .header {
-            background: linear-gradient(135deg, 
-                rgba(190, 24, 93, 0.95) 0%, 
-                rgba(219, 39, 119, 0.95) 50%,
-                rgba(236, 72, 153, 0.95) 100%);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            font-weight: 800;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            letter-spacing: -0.5px;
-        }
-        
-        .header p {
-            opacity: 0.95;
-            font-size: 1rem;
-            max-width: 100%;
-            margin: 0 auto;
-            line-height: 1.4;
-            font-weight: 300;
-        }
-        
-        .tagline {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 15px;
-            border-radius: 25px;
-            margin-top: 15px;
-            font-size: 0.85rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .quiz-container {
-            padding: 25px 20px;
-        }
-        
-        .question-card {
-            display: none;
-        }
-        
-        .question-card.active {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .question-number {
-            color: #ec4899;
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .question-number::before {
-            content: '';
-            width: 25px;
-            height: 3px;
-            background: linear-gradient(90deg, #ec4899, #f472b6);
-            border-radius: 3px;
-        }
-        
-        .question-text {
-            font-size: 1.5rem;
-            margin-bottom: 25px;
-            color: #1e293b;
-            line-height: 1.3;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            background: linear-gradient(135deg, #9f1239, #be185d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-        
-        .option-btn {
-            padding: 18px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            width: 100%;
-        }
-        
-        .option-btn:hover {
-            border-color: #f472b6;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.1);
-        }
-        
-        .option-btn.selected {
-            border-color: #ec4899;
-            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
-            font-weight: 700;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.15);
-        }
-        
-        .option-btn.selected::after {
-            content: "✓";
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            color: #ec4899;
-            font-weight: bold;
-            font-size: 1.1rem;
-            background: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.2);
-        }
-        
-        .option-btn small {
-            display: block;
-            margin-top: 6px;
-            font-size: 0.85rem;
-            color: #64748b;
-            font-weight: 500;
-            line-height: 1.3;
-        }
-        
-        .emoji-options {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-        
-        .emoji-btn {
-            font-size: 2.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 15px;
-            border-radius: 15px;
-            background: white;
-            border: 2px solid transparent;
-            position: relative;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .emoji-btn.selected {
-            border-color: #ec4899;
-            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
-            transform: scale(1.05);
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            background: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: #ec4899;
-            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
-        }
-        
-        .auto-progress-indicator {
-            text-align: center;
-            color: #ec4899;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .progress-bar {
-            height: 6px;
-            background: #f8fafc;
-            border-radius: 3px;
-            margin-bottom: 25px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ec4899, #f472b6);
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-        
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
-        
-        .nav-btn {
-            padding: 14px 20px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            justify-content: center;
-        }
-        
-        .btn-back {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            color: #475569;
-        }
-        
-        .btn-generate {
-            background: linear-gradient(135deg, #ec4899, #f472b6);
-            color: white;
-        }
-        
-        .btn-back:hover, .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-        
-        .result-container {
-            display: none;
-            padding: 25px 20px;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .result-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .result-header h2 {
-            background: linear-gradient(135deg, #be185d, #db2777);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-        
-        .roadmap {
-            background: linear-gradient(135deg, rgba(253, 242, 248, 0.9), rgba(252, 231, 243, 0.9));
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.08);
-        }
-        
-        .roadmap::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
-            height: 100%;
-            background: linear-gradient(180deg, #ec4899, #f472b6);
-            border-radius: 5px;
-        }
-        
-        .roadmap h3 {
-            background: linear-gradient(135deg, #be185d, #db2777);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .roadmap-step {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px dashed #f8c6dd;
-            position: relative;
-            animation: fadeInUp 0.5s ease forwards;
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .roadmap-step:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .step-icon {
-            font-size: 1.8rem;
-            margin-right: 15px;
-            min-width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #fce7f3, #fdf2f8);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ec4899;
-            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.1);
-            flex-shrink: 0;
-        }
-        
-        .step-content h4 {
-            color: #be185d;
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .step-content p {
-            color: #475569;
-            line-height: 1.5;
-            font-size: 0.95rem;
-        }
-        
-        .meters {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .meter {
-            text-align: center;
-            padding: 20px 15px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .meter::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #ec4899, #f472b6);
-        }
-        
-        .meter-label {
-            font-weight: 700;
-            color: #64748b;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .meter-value {
-            font-size: 1.8rem;
-            background: linear-gradient(135deg, #ec4899, #f472b6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            margin-bottom: 15px;
-        }
-        
-        .meter-bar {
-            height: 8px;
-            background: #f1f5f9;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .meter-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ec4899, #f472b6);
-            border-radius: 4px;
-            width: 0;
-            transition: width 1s ease;
-        }
-        
-        .course-recommendations {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        
-        .course-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(236, 72, 153, 0.08);
-            border: 1px solid #fdf2f8;
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.5s ease forwards;
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        
-        .course-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: linear-gradient(135deg, #ec4899, #f472b6);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        
-        .course-title {
-            color: #be185d;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            font-weight: 800;
-        }
-        
-        .course-details {
-            color: #475569;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            font-size: 0.9rem;
-        }
-        
-        .course-highlight {
-            background: linear-gradient(135deg, rgba(236, 72, 153, 0.08), rgba(244, 114, 182, 0.08));
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            border-left: 3px solid #ec4899;
-            font-size: 0.85rem;
-        }
-        
-        .opportunity-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            box-shadow: 0 5px 20px rgba(236, 72, 153, 0.08);
-            border: 1px solid #fdf2f8;
-            animation: fadeInUp 0.5s ease forwards;
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        
-        .opportunity-card h4 {
-            color: #be185d;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .opportunity-card ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .opportunity-card li {
-            padding: 8px 0;
-            border-bottom: 1px solid #fce7f3;
-            color: #475569;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .opportunity-card li:last-child {
-            border-bottom: none;
-        }
-        
-        .restart-btn {
-            display: block;
-            margin: 30px auto 0;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, #ec4899, #f472b6);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            font-weight: 700;
-            transition: all 0.3s;
-            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .restart-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
-        }
-        
-        .loading-dots {
-            display: inline-flex;
-            gap: 5px;
-            margin-right: 10px;
-        }
-        
-        .loading-dots span {
-            width: 8px;
-            height: 8px;
-            background: white;
-            border-radius: 50%;
-            animation: loadingDot 1.4s infinite ease-in-out;
-        }
-        
-        @keyframes loadingDot {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-        
-        /* Touch-friendly improvements */
-        .option-btn {
-            -webkit-tap-highlight-color: transparent;
-            min-height: 70px;
-        }
-        
-        .emoji-btn {
-            -webkit-tap-highlight-color: transparent;
-            min-height: 80px;
-        }
-        
-        .nav-btn {
-            -webkit-tap-highlight-color: transparent;
-            min-height: 50px;
-        }
-        
-        /* Prevent text selection */
-        .option-btn, .emoji-btn, .nav-btn {
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        
-        /* Responsive adjustments */
-        @media (min-width: 768px) {
-            body {
-                padding: 30px;
-            }
-            
-            .container {
-                max-width: 800px;
-                border-radius: 25px;
-            }
-            
-            .header {
-                padding: 40px 30px;
-            }
-            
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .header p {
-                font-size: 1.2rem;
-            }
-            
-            .quiz-container {
-                padding: 40px 30px;
-            }
-            
-            .question-text {
-                font-size: 1.8rem;
-            }
-            
-            .options-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-            
-            .emoji-options {
-                gap: 20px;
-            }
-            
-            .emoji-btn {
-                font-size: 3rem;
-                padding: 20px;
-            }
-            
-            .result-container {
-                padding: 40px 30px;
-            }
-            
-            .result-header h2 {
-                font-size: 2.2rem;
-            }
-            
-            .roadmap {
-                padding: 30px;
-                border-radius: 20px;
-            }
-            
-            .meters {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .course-recommendations {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .question-text {
-                font-size: 1.3rem;
-            }
-            
-            .option-btn {
-                padding: 15px 12px;
-                font-size: 0.95rem;
-            }
-            
-            .emoji-btn {
-                font-size: 2rem;
-                padding: 12px;
-            }
-            
-            .nav-btn {
-                padding: 12px 15px;
-                font-size: 0.95rem;
-            }
-            
-            .meters {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PATHFINDER</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body{
+      min-height:100vh;
+      padding:16px;
+      overflow-x:hidden;
+      background: linear-gradient(135deg, #ffe4f1 0%, #f2e7ff 60%, #ffeef7 100%);
+    }
+
+    .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.22; }
+    .shape { position:absolute; border-radius: 999px; filter: blur(1px); }
+    .shape.s1 { width: 240px; height: 240px; top: 8%; left: 4%; background: radial-gradient(circle at 30% 30%, #ff7bb5, transparent 60%); }
+    .shape.s2 { width: 220px; height: 220px; bottom: 10%; right: 5%; background: radial-gradient(circle at 40% 40%, #b58bff, transparent 60%); }
+    .shape.s3 { width: 140px; height: 140px; top: 55%; left: 7%; background: radial-gradient(circle at 40% 40%, #ffb4d8, transparent 60%); opacity: 0.85;}
+    .shape.s4 { width: 160px; height: 160px; top: 18%; right: 10%; background: radial-gradient(circle at 30% 30%, #d7c2ff, transparent 60%); opacity: 0.85;}
+
+    .container{
+      max-width: 860px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.92);
+      border-radius: 22px;
+      box-shadow: 0 16px 40px rgba(190, 24, 93, 0.14);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255,255,255,0.55);
+      backdrop-filter: blur(10px);
+    }
+
+    .header{
+      color: #fff;
+      padding: 28px 20px;
+      text-align:center;
+      position: relative;
+      background: linear-gradient(135deg, rgba(236,72,153,0.92) 0%, rgba(168,85,247,0.92) 100%);
+      overflow: hidden;
+    }
+    .header h1{
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+    }
+    .header p{
+      opacity: 0.96;
+      margin-top: 8px;
+      font-size: 1rem;
+      font-weight: 400;
+    }
+    .tagline{
+      display: inline-flex;
+      align-items:center;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.24);
+      font-size: 0.92rem;
+    }
+
+    .progress-bar{
+      height: 7px;
+      background: rgba(15,23,42,0.06);
+      overflow:hidden;
+      position: relative;
+    }
+    .progress-fill{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ec4899, #a855f7);
+      transition: width 0.45s ease;
+    }
+
+    .quiz-container, .result-container{ padding: 26px 20px; }
+    .question-card{ display:none; }
+    .question-card.active{ display:block; animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+    .question-number{
+      color: #a21caf;
+      font-weight: 800;
+      font-size: 0.92rem;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .question-number::before{
+      content:'';
+      width: 28px;
+      height: 4px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #ec4899, #a855f7);
+    }
+
+    .question-text{
+      font-size: 1.55rem;
+      margin-bottom: 20px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      background: linear-gradient(135deg, #be185d, #6d28d9);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+
+    .options-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .option-btn{
+      width:100%;
+      text-align:left;
+      padding: 16px 14px;
+      border-radius: 16px;
+      border: 2px solid rgba(15,23,42,0.10);
+      background: rgba(255,255,255,0.98);
+      cursor:pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 18px rgba(2,6,23,0.05);
+      min-height: 68px;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .option-btn:hover{
+      transform: translateY(-2px);
+      border-color: rgba(236,72,153,0.45);
+      box-shadow: 0 14px 28px rgba(236,72,153,0.10);
+    }
+    .option-btn.selected{
+      border-color: rgba(168,85,247,0.7);
+      background: linear-gradient(135deg, rgba(253,242,248,0.95), rgba(243,232,255,0.95));
+      font-weight: 800;
+      transform: translateY(-2px);
+    }
+    .option-btn small{
+      display:block;
+      margin-top: 6px;
+      color: rgba(71,85,105,0.95);
+      font-weight: 600;
+      font-size: 0.86rem;
+      line-height: 1.25;
+    }
+
+    .input-field{
+      width: 100%;
+      padding: 15px 14px;
+      border: 2px solid rgba(15,23,42,0.10);
+      border-radius: 14px;
+      font-size: 1rem;
+      margin: 10px 0 14px;
+      background: rgba(255,255,255,0.98);
+      box-shadow: 0 8px 18px rgba(2,6,23,0.03);
+      transition: all 0.2s ease;
+    }
+    .input-field:focus{
+      outline:none;
+      border-color: rgba(168,85,247,0.65);
+      box-shadow: 0 0 0 3px rgba(168,85,247,0.12);
+    }
+
+    .nav-buttons{ display:flex; gap: 10px; margin-top: 18px; }
+    .nav-btn{
+      flex:1;
+      padding: 13px 16px;
+      border: none;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 800;
+      font-size: 1rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      box-shadow: 0 10px 20px rgba(2,6,23,0.10);
+      transition: all 0.25s ease;
+      min-height: 52px;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-back{
+      background: linear-gradient(135deg, rgba(248,250,252,1), rgba(241,245,249,1));
+      color: #475569;
+    }
+    .btn-generate{
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      color:#fff;
+      opacity: 0.6;
+    }
+    .nav-btn:hover{ transform: translateY(-2px); }
+
+    .helper-row{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 6px;
+      color: rgba(71,85,105,0.95);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(168,85,247,0.10);
+      border: 1px solid rgba(168,85,247,0.18);
+      color:#5b21b6;
+      font-weight: 900;
+      font-size: 0.85rem;
+    }
+
+    /* RESULT */
+    .result-container{ display:none; animation: fadeIn 0.45s ease; }
+    .result-header{ text-align:center; margin-bottom: 22px; }
+    .result-header h2{
+      font-size: 1.9rem;
+      font-weight: 950;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #be185d, #6d28d9);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.15;
+    }
+    .result-header p{ margin-top: 8px; color: rgba(71,85,105,0.95); font-weight: 650; }
+
+    .panel{
+      background: linear-gradient(135deg, rgba(253,242,248,0.85), rgba(243,232,255,0.85));
+      border: 1px solid rgba(255,255,255,0.75);
+      border-radius: 18px;
+      padding: 18px 18px;
+      box-shadow: 0 14px 30px rgba(236,72,153,0.08);
+      margin-bottom: 16px;
+      position: relative;
+      overflow:hidden;
+    }
+    .panel::before{
+      content:'';
+      position:absolute;
+      top:0; left:0;
+      width: 6px; height:100%;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ec4899, #a855f7);
+      opacity: 0.9;
+    }
+    .panel h3{
+      margin-left: 10px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      color: #6d28d9;
+      font-weight: 950;
+      font-size: 1.18rem;
+      margin-bottom: 12px;
+    }
+    .panel p, .panel li{
+      margin-left: 10px;
+      color: rgba(30,41,59,0.92);
+      font-weight: 650;
+      line-height: 1.55;
+      font-size: 0.96rem;
+    }
+
+    .course-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .course-card{
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid rgba(236,72,153,0.15);
+      box-shadow: 0 10px 22px rgba(2,6,23,0.05);
+    }
+    .course-title{
+      font-weight: 950;
+      color: #be185d;
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .badge{
+      font-size: 0.78rem;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #fff;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      white-space: nowrap;
+    }
+    .muted{
+      color: rgba(71,85,105,0.92);
+      font-weight: 650;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .list{
+      margin-top: 10px;
+      padding-left: 0;
+      list-style: none;
+      display:grid;
+      gap: 8px;
+    }
+    .list li{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 10px 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(15,23,42,0.06);
+    }
+    .list a{ color: #6d28d9; font-weight: 900; text-decoration: none; }
+    .list a:hover{ text-decoration: underline; }
+
+    .restart-btn{
+      display:block;
+      margin: 22px auto 8px;
+      padding: 14px 24px;
+      border:none;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 950;
+      font-size: 1.05rem;
+      color:#fff;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      box-shadow: 0 14px 30px rgba(236,72,153,0.20);
+      transition: all 0.25s ease;
+    }
+    .restart-btn:hover{ transform: translateY(-2px); }
+
+    .footer-note{
+      text-align:center;
+      color: rgba(71,85,105,0.78);
+      font-size: 0.83rem;
+      padding: 14px 10px 18px;
+    }
+
+    @media(min-width: 820px){
+      body{ padding: 28px; }
+      .header{ padding: 34px 28px; }
+      .header h1{ font-size: 2.5rem; }
+      .quiz-container, .result-container{ padding: 34px 28px; }
+      .question-text{ font-size: 1.85rem; }
+      .options-grid{ grid-template-columns: repeat(2, 1fr); }
+      .course-grid{ grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
 </head>
+
 <body>
-    <!-- Simple background -->
-    <div class="bg-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-    
-    <div class="container">
-        <div class="header">
-            <div class="header-content">
-                <h1><i class="fas fa-map-marked-alt"></i> PATHFINDER</h1>
-                <p>Your College & Career Sidekick</p>
-                <div class="tagline">
-                    <i class="fas fa-heart"></i>
-                    <span>Tap your answers - we'll craft your perfect path!</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        
-        <!-- QUIZ SECTION -->
-        <div class="quiz-container" id="quizSection">
-            <!-- Question 1 -->
-            <div class="question-card active" id="question1">
-                <div class="question-number">Question 1 of 8</div>
-                <h2 class="question-text">What's your current academic vibe?</h2>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectAndProgress(1, 'STEM Squad', this)">
-                        <i class="fas fa-microscope" style="color: #ec4899; margin-right: 8px;"></i>
-                        🔬 STEM Squad<br><small>Math, Science, Technology enthusiast</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(1, 'HUMSS Hero', this)">
-                        <i class="fas fa-landmark" style="color: #ec4899; margin-right: 8px;"></i>
-                        📚 HUMSS Hero<br><small>Society, Politics, Humanities</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(1, 'ABM Hustler', this)">
-                        <i class="fas fa-chart-line" style="color: #ec4899; margin-right: 8px;"></i>
-                        💼 ABM Hustler<br><small>Business, Accounting, Marketing</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(1, 'TVL/Tech Master', this)">
-                        <i class="fas fa-tools" style="color: #ec4899; margin-right: 8px;"></i>
-                        🔧 TVL/Tech Master<br><small>Hands-on technical skills</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(1, 'Still Figuring It Out', this)">
-                        <i class="fas fa-search" style="color: #ec4899; margin-right: 8px;"></i>
-                        🤔 Still Figuring It Out<br><small>Exploring all possibilities</small>
-                    </button>
-                </div>
-                <div class="auto-progress-indicator">
-                    <i class="fas fa-hand-point-up"></i>
-                    <span>Select an option to continue</span>
-                </div>
-            </div>
-            
-            <!-- Question 2 -->
-            <div class="question-card" id="question2">
-                <div class="question-number">Question 2 of 8</div>
-                <h2 class="question-text">How are you feeling about your strand?</h2>
-                <div class="emoji-options">
-                    <div class="emoji-btn" onclick="selectEmojiAndProgress('😩 Drowning', this)">😩</div>
-                    <div class="emoji-btn" onclick="selectEmojiAndProgress('😐 Meh', this)">😐</div>
-                    <div class="emoji-btn" onclick="selectEmojiAndProgress('🙂 Chilling', this)">🙂</div>
-                    <div class="emoji-btn" onclick="selectEmojiAndProgress('🤩 Loving It!', this)">🤩</div>
-                </div>
-                <p style="text-align: center; color: #64748b; margin-top: 10px; font-weight: 600;" id="emojiLabel">Tap an emoji to continue</p>
-                <div class="auto-progress-indicator">
-                    <i class="fas fa-magic"></i>
-                    <span>We'll move forward automatically</span>
-                </div>
-                <div class="nav-buttons">
-                    <button class="btn-back" onclick="prevQuestion()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Question 3 -->
-            <div class="question-card" id="question3">
-                <div class="question-number">Question 3 of 8</div>
-                <h2 class="question-text">What's your dream job?</h2>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectAndProgress(3, 'Creative', this)">
-                        <i class="fas fa-palette" style="color: #ec4899; margin-right: 8px;"></i>
-                        🎨 Creative<br><small>Artist, YouTuber, Designer</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(3, 'Helper', this)">
-                        <i class="fas fa-hands-helping" style="color: #ec4899; margin-right: 8px;"></i>
-                        🤝 Helper<br><small>Doctor, Teacher, Social Worker</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(3, 'Builder', this)">
-                        <i class="fas fa-hard-hat" style="color: #ec4899; margin-right: 8px;"></i>
-                        🏗️ Builder<br><small>Engineer, Architect, Programmer</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(3, 'Boss', this)">
-                        <i class="fas fa-crown" style="color: #ec4899; margin-right: 8px;"></i>
-                        👔 Boss<br><small>Entrepreneur, CEO, Manager</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(3, 'Explorer', this)">
-                        <i class="fas fa-globe-americas" style="color: #ec4899; margin-right: 8px;"></i>
-                        🌍 Explorer<br><small>Scientist, Researcher, Traveler</small>
-                    </button>
-                </div>
-                <input type="text" class="input-field" placeholder="Or type your own dream job..." id="customJob" onkeypress="handleCustomJobEnter(event)">
-                <div class="auto-progress-indicator">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>Choose or type your own</span>
-                </div>
-                <div class="nav-buttons">
-                    <button class="btn-back" onclick="prevQuestion()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Question 4 -->
-            <div class="question-card" id="question4">
-                <div class="question-number">Question 4 of 8</div>
-                <h2 class="question-text">Preferred work environment?</h2>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectAndProgress(4, 'City Life', this)">
-                        <i class="fas fa-city" style="color: #ec4899; margin-right: 8px;"></i>
-                        🏙️ City Life<br><small>Skyscrapers, fast pace</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(4, 'Small Town', this)">
-                        <i class="fas fa-home" style="color: #ec4899; margin-right: 8px;"></i>
-                        🏡 Small Town<br><small>Know everyone, quieter</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(4, 'Remote/Flexible', this)">
-                        <i class="fas fa-laptop-house" style="color: #ec4899; margin-right: 8px;"></i>
-                        🏝️ Remote/Flexible<br><small>Anywhere with WiFi</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(4, 'Outdoors', this)">
-                        <i class="fas fa-tree" style="color: #ec4899; margin-right: 8px;"></i>
-                        🌳 Outdoors<br><small>Not stuck in an office</small>
-                    </button>
-                </div>
-                <div class="auto-progress-indicator">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Select your work preference</span>
-                </div>
-                <div class="nav-buttons">
-                    <button class="btn-back" onclick="prevQuestion()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Question 5 -->
-            <div class="question-card" id="question5">
-                <div class="question-number">Question 5 of 8</div>
-                <h2 class="question-text">How important is money?</h2>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectAndProgress(5, 'Survival Mode', this)">
-                        <i class="fas fa-money-bill-wave" style="color: #ec4899; margin-right: 8px;"></i>
-                        💸 Survival Mode<br><small>Support my family ASAP</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(5, 'Comfortable', this)">
-                        <i class="fas fa-piggy-bank" style="color: #ec4899; margin-right: 8px;"></i>
-                        💰 Comfortable<br><small>Nice life, not rich</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(5, 'High Roller', this)">
-                        <i class="fas fa-gem" style="color: #ec4899; margin-right: 8px;"></i>
-                        🤑 High Roller<br><small>Luxury & financial freedom</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(5, 'Passion First', this)">
-                        <i class="fas fa-heart" style="color: #ec4899; margin-right: 8px;"></i>
-                        ❤️ Passion First<br><small>Money isn't my main driver</small>
-                    </button>
-                </div>
-                <div class="auto-progress-indicator">
-                    <i class="fas fa-coins"></i>
-                    <span>Choose your financial priority</span>
-                </div>
-                <div class="nav-buttons">
-                    <button class="btn-back" onclick="prevQuestion()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Question 6 -->
-            <div class="question-card" id="question6">
-                <div class="question-number">Question 6 of 8</div>
-                <h2 class="question-text">What's your superpower?</h2>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectAndProgress(6, 'Problem-Solving', this)">
-                        <i class="fas fa-lightbulb" style="color: #ec4899; margin-right: 8px;"></i>
-                        💡 Problem-Solving<br><small>Fixing things, puzzles, logic</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(6, 'Communication', this)">
-                        <i class="fas fa-comments" style="color: #ec4899; margin-right: 8px;"></i>
-                        🗣️ Communication<br><small>Talking, writing, persuading</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(6, 'Creativity', this)">
-                        <i class="fas fa-paint-brush" style="color: #ec4899; margin-right: 8px;"></i>
-                        🎨 Creativity<br><small>Art, ideas, thinking outside box</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(6, 'Helping', this)">
-                        <i class="fas fa-hands" style="color: #ec4899; margin-right: 8px;"></i>
-                        🤝 Helping<br><small>Listening, supporting, organizing</small>
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(6, 'Making Things', this)">
-                        <i class="fas fa-hammer" style="color: #ec4899; margin-right: 8px;"></i>
-                        🔧 Making Things<br><small>Building, crafting, hands-on</small>
-                    </button>
-                </div>
-                <div class="auto-progress-indicator">
-                    <i class="fas fa-bolt"></i>
-                    <span>Tap your natural talent</span>
-                </div>
-                <div class="nav-buttons">
-                    <button class="btn-back" onclick="prevQuestion()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Question 7 -->
-            <div class="question-card" id="question7">
-                <div class="question-number">Question 7 of 8</div>
-                <h2 class="question-text">The Reality Check</h2>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectAndProgress(7, 'Clear Plan', this)">
-                        <i class="fas fa-clipboard-check" style="color: #ec4899; margin-right: 8px;"></i>
-                        📋 "I have a clear plan and just need the steps"
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(7, 'Interests No Clue', this)">
-                        <i class="fas fa-question-circle" style="color: #ec4899; margin-right: 8px;"></i>
-                        🤷 "I have interests but no clue how to make them a career"
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(7, 'Parents Plan', this)">
-                        <i class="fas fa-user-friends" style="color: #ec4899; margin-right: 8px;"></i>
-                        👨‍👩‍👧 "My parents have a plan for me, but I'm not sure"
-                    </button>
-                    <button class="option-btn" onclick="selectAndProgress(7, 'Stable First', this)">
-                        <i class="fas fa-shield-alt" style="color: #ec4899; margin-right: 8px;"></i>
-                        🏦 "I just want to find something stable and figure it out later"
-                    </button>
-                </div>
-                <div class="auto-progress-indicator">
-                    <i class="fas fa-search"></i>
-                    <span>Almost there! Choose to continue</span>
-                </div>
-                <div class="nav-buttons">
-                    <button class="btn-back" onclick="prevQuestion()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Question 8 -->
-            <div class="question-card" id="question8">
-                <div class="question-number">Question 8 of 8</div>
-                <h2 class="question-text">Where are you from?</h2>
-                <p style="color: #64748b; margin-bottom: 20px; font-size: 1rem; font-weight: 600;">This helps us find opportunities near you!</p>
-                
-                <select class="input-field" id="regionSelect" onchange="checkLocationComplete()">
-                    <option value="">📍 Select your region</option>
-                    <option value="NCR">National Capital Region (NCR) - Metro Manila</option>
-                    <option value="Region III">Central Luzon (Region III) - Pampanga, Bulacan, Tarlac, Zambales, etc.</option>
-                </select>
-                
-                <input type="text" class="input-field" id="cityInput" placeholder="🏙️ Enter your city or town" oninput="checkLocationComplete()">
-                
-                <div class="auto-progress-indicator" id="locationIndicator">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Fill both fields to continue</span>
-                </div>
-                
-                <div class="nav-buttons">
-                    <button class="btn-back" onclick="prevQuestion()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                    <button class="btn-generate" id="generateBtn" onclick="generateRoadmap()" disabled>
-                        <i class="fas fa-rocket"></i>
-                        Generate Roadmap
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- RESULTS SECTION -->
-        <div class="result-container" id="resultSection">
-            <div class="result-header">
-                <h2><i class="fas fa-trophy"></i> Your Personalized Roadmap is Ready! 🎉</h2>
-                <p style="color: #64748b; font-size: 1rem; margin-top: 10px;">Based on your answers, here's your detailed path forward</p>
-            </div>
-            
-            <div class="roadmap">
-                <h3><i class="fas fa-calendar-alt"></i> Your 3-Year Strategic Roadmap</h3>
-                
-                <div class="roadmap-step" style="animation-delay: 0.1s">
-                    <div class="step-icon">🎯</div>
-                    <div class="step-content">
-                        <h4><i class="fas fa-graduation-cap"></i> Grade 12 - Foundation Phase</h4>
-                        <p id="step1">Loading your personalized foundation plan...</p>
-                    </div>
-                </div>
-                
-                <div class="roadmap-step" style="animation-delay: 0.2s">
-                    <div class="step-icon">🏫</div>
-                    <div class="step-content">
-                        <h4><i class="fas fa-university"></i> Year 1 - Exploration Phase</h4>
-                        <p id="step2">Loading your personalized exploration plan...</p>
-                    </div>
-                </div>
-                
-                <div class="roadmap-step" style="animation-delay: 0.3s">
-                    <div class="step-icon">💼</div>
-                    <div class="step-content">
-                        <h4><i class="fas fa-briefcase"></i> Year 2-3 - Building Phase</h4>
-                        <p id="step3">Loading your personalized building plan...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Top 3 Course Recommendations -->
-            <h3 style="background: linear-gradient(135deg, #be185d, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 25px 0 15px; font-size: 1.4rem; font-weight: 800;">
-                <i class="fas fa-graduation-cap"></i> Top 3 Course Recommendations for You
-            </h3>
-            
-            <div class="course-recommendations" id="courseRecommendations">
-                <!-- Course cards will be populated here -->
-            </div>
-            
-            <!-- Local Opportunities Section -->
-            <div id="opportunitySection" style="display: none;">
-                <h3 style="background: linear-gradient(135deg, #be185d, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 25px 0 15px; font-size: 1.4rem; font-weight: 800;">
-                    <i class="fas fa-map-pin"></i> Local Opportunities in <span id="locationName"></span>
-                </h3>
-                <div class="opportunity-card" style="animation-delay: 0.1s">
-                    <h4><i class="fas fa-building"></i> Top Companies Hiring in Your Area</h4>
-                    <ul id="companiesList"></ul>
-                </div>
-                <div class="opportunity-card" style="animation-delay: 0.2s">
-                    <h4><i class="fas fa-school"></i> Recommended Universities & Colleges</h4>
-                    <ul id="schoolsList"></ul>
-                </div>
-                <div class="opportunity-card" style="animation-delay: 0.3s">
-                    <h4><i class="fas fa-certificate"></i> Local Training & Certification Programs</h4>
-                    <ul id="trainingList"></ul>
-                </div>
-            </div>
-            
-            <h3 style="background: linear-gradient(135deg, #be185d, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 25px 0 15px; font-size: 1.4rem; font-weight: 800;">
-                <i class="fas fa-chart-bar"></i> Your Career Profile Analysis
-            </h3>
-            
-            <div class="meters">
-                <div class="meter" style="animation-delay: 0.1s">
-                    <div class="meter-label"><i class="fas fa-fire"></i> Passion Match</div>
-                    <div class="meter-value" id="passionScore">0%</div>
-                    <div class="meter-bar">
-                        <div class="meter-fill" id="passionBar"></div>
-                    </div>
-                </div>
-                
-                <div class="meter" style="animation-delay: 0.2s">
-                    <div class="meter-label"><i class="fas fa-briefcase"></i> Local Demand</div>
-                    <div class="meter-value" id="demandScore">0%</div>
-                    <div class="meter-bar">
-                        <div class="meter-fill" id="demandBar"></div>
-                    </div>
-                </div>
-                
-                <div class="meter" style="animation-delay: 0.3s">
-                    <div class="meter-label"><i class="fas fa-chart-line"></i> Growth Potential</div>
-                    <div class="meter-value" id="growthScore">0%</div>
-                    <div class="meter-bar">
-                        <div class="meter-fill" id="growthBar"></div>
-                    </div>
-                </div>
-                
-                <div class="meter" style="animation-delay: 0.4s">
-                    <div class="meter-label"><i class="fas fa-balance-scale"></i> Work-Life Balance</div>
-                    <div class="meter-value" id="balanceScore">0%</div>
-                    <div class="meter-bar">
-                        <div class="meter-fill" id="balanceBar"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <div style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(244, 114, 182, 0.1)); padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid rgba(236, 72, 153, 0.2);">
-                    <p style="color: #be185d; margin-bottom: 10px; font-size: 1rem; font-weight: 800;">
-                        <i class="fas fa-lightbulb" style="color: #f59e0b; margin-right: 10px;"></i>
-                        <strong>Pro Tip from Career Experts:</strong>
-                    </p>
-                    <p style="color: #475569; font-size: 0.95rem; line-height: 1.5;" id="proTip">Loading expert advice...</p>
-                </div>
-                <button class="restart-btn" onclick="restartQuiz()">
-                    <i class="fas fa-redo"></i>
-                    Take Quiz Again & Refine Your Path
-                </button>
-            </div>
-        </div>
+  <div class="bg-shapes">
+    <div class="shape s1"></div>
+    <div class="shape s2"></div>
+    <div class="shape s3"></div>
+    <div class="shape s4"></div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1><i class="fa-solid fa-compass"></i> PATHFINDER</h1>
+      <p>Find your Path, Forge your Future</p>
+      <div class="tagline">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>Answer the quiz — we’ll recommend courses, schools, and local opportunities.</span>
+      </div>
     </div>
 
-    <script>
-        // COMPREHENSIVE DATABASE - SUPER RICH DATA
-        const careerDatabase = {
-            'STEM Squad': {
-                pathways: {
-                    'Builder': {
-                        title: "Tech & Engineering Path",
-                        steps: {
-                            step1: "EXCEL in Calculus, Physics, and Computer Programming. Maintain 90+ average in STEM subjects. Join Robotics Club and compete in National Science Fair. Complete 3 coding projects in Python/Java. Build portfolio on GitHub with at least 5 repositories.",
-                            step2: "PURSUE BS Computer Science at UP Diliman (Tuition: ₱50,000/year) or BS Information Technology at Mapúa (₱120,000/year). Join Google Developer Student Club. Secure summer internship at Accenture (₱25,000/month stipend). Get AWS Cloud Practitioner certification (₱5,000 exam fee).",
-                            step3: "SPECIALIZE in Artificial Intelligence at AIM (₱600,000 total) or Data Science at UP. Complete advanced certifications (AWS Solutions Architect, Google Cloud Professional). Build portfolio with 10+ real-world projects. Network at DevCon Philippines and Singapore Tech Summit."
-                        },
-                        moves: {
-                            move1: "COMPLETE 'Python for Everybody' on Coursera (Free). Attend DICT's free coding bootcamp this Saturday. Build a simple CRUD application using Django.",
-                            move2: "CONNECT with 5 tech professionals on LinkedIn. Join CodeChum national coding competition. Attend at least 3 tech meetups in your area.",
-                            move3: "APPLY for Junior Developer positions (₱25,000-₱35,000/month). Target companies: Globe Telecom, UnionBank, PayMongo. Build network of 50+ tech industry contacts."
-                        },
-                        skills: ["Python", "JavaScript", "React.js", "Cloud Computing", "Data Structures", "Problem Solving", "Git/GitHub", "Database Management", "API Development", "DevOps Basics"],
-                        demand: 95,
-                        growth: 98,
-                        balance: 75,
-                        topCourses: [
-                            {
-                                rank: 1,
-                                name: "BS Computer Science",
-                                schools: ["University of the Philippines Diliman (Public, ₱50K/year)", "Ateneo de Manila University (Private, ₱120K/year)", "De La Salle University (Private, ₱110K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱50,000 - ₱120,000/year",
-                                entrySalary: "₱25,000 - ₱40,000/month",
-                                midCareer: "₱80,000 - ₱150,000/month",
-                                demand: "Very High (95% employment rate)",
-                                specializations: ["Artificial Intelligence", "Data Science", "Software Engineering", "Cybersecurity", "Game Development"],
-                                certifications: ["AWS Certified Cloud Practitioner", "Google IT Support Professional", "Microsoft Azure Fundamentals"],
-                                scholarships: ["DOST-SEI Merit Scholarship (₱40K/year + allowance)", "CHED Scholarship (Free tuition)", "SM Foundation Scholarship"]
-                            },
-                            {
-                                rank: 2,
-                                name: "BS Information Technology",
-                                schools: ["Mapúa University (Private, ₱120K/year)", "University of Santo Tomas (Private, ₱90K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★", "Technological University of the Philippines (Public, ₱15K/year)"],
-                                duration: "4 years",
-                                cost: "₱40,000 - ₱100,000/year",
-                                entrySalary: "₱22,000 - ₱35,000/month",
-                                midCareer: "₱70,000 - ₱120,000/month",
-                                demand: "High (90% employment rate)",
-                                specializations: ["Cybersecurity", "Web Development", "Network Administration", "Database Management", "Mobile App Development"],
-                                certifications: ["Cisco CCNA", "CompTIA Security+", "Microsoft Certified: Azure Administrator"],
-                                scholarships: ["DICT Scholarship Program", "PLDT-Smart Foundation", "Globe Future Makers"]
-                            },
-                            {
-                                rank: 3,
-                                name: "BS Computer Engineering",
-                                schools: ["University of the Philippines Diliman (Public, ₱55K/year)", "Mapúa University (Private, ₱130K/year)", "Holy Angel University (Private, ₱80K/year)", "Gordon College Olongapo (Public, ₱16K/year) ★"],
-                                duration: "5 years",
-                                cost: "₱60,000 - ₱130,000/year",
-                                entrySalary: "₱28,000 - ₱45,000/month",
-                                midCareer: "₱85,000 - ₱160,000/month",
-                                demand: "High (92% employment rate)",
-                                specializations: ["Embedded Systems", "Hardware Design", "IoT Development", "Robotics", "Computer Architecture"],
-                                certifications: ["Arduino Certification", "Embedded Systems Professional", "IoT Fundamentals"],
-                                scholarships: ["DOST Engineering Scholarship", "Intel Philippines Scholarship", "Texas Instruments Scholarship"]
-                            }
-                        ]
-                    },
-                    'Explorer': {
-                        title: "Research & Development Path",
-                        steps: {
-                            step1: "EXCEL in Biology, Chemistry, Advanced Mathematics. Maintain 92+ average. Join Science Club. Publish research in school journal. Win regional science fair. Complete 50+ hours of laboratory work.",
-                            step2: "PURSUE BS Biology at UP Los Baños (Tuition: ₱40,000/year) or BS Chemistry at Ateneo (₱110,000/year). Apply for DOST-SEI scholarship (₱7,000/month stipend + tuition). Join research team. Present at national science conference.",
-                            step3: "PURSUE Master's in Environmental Science at UPLB (₱30,000/semester). Work at DOST or research institutes. Publish 2 papers in international journals. Apply for PhD scholarships abroad (Japan, Germany, Australia)."
-                        },
-                        moves: {
-                            move1: "VOLUNTEER at Philippine Science High School outreach. Read 5 research papers from 'Philippine Journal of Science'. Visit DOST website for student programs.",
-                            move2: "CONNECT with DOST researchers on LinkedIn. Attend Philippine Society of Microbiology conference. Join iNaturalist Philippines community.",
-                            move3: "APPLY for Science Research Specialist I position at DOST (Salary Grade 13: ₱29,798/month). Prepare for Civil Service Exam. Build portfolio of research papers."
-                        },
-                        skills: ["Research Methodology", "Data Analysis (SPSS/R)", "Scientific Writing", "Laboratory Techniques", "Critical Thinking", "Statistics", "Technical Reporting", "Experimental Design", "Peer Review", "Grant Writing"],
-                        demand: 80,
-                        growth: 85,
-                        balance: 70,
-                        topCourses: [
-                            {
-                                rank: 1,
-                                name: "BS Biology",
-                                schools: ["University of the Philippines Los Baños (Public, ₱40K/year)", "University of Santo Tomas (Private, ₱100K/year)", "Ateneo de Manila University (Private, ₱110K/year)", "Gordon College Olongapo (Public, ₱16K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱40,000 - ₱100,000/year",
-                                entrySalary: "₱22,000 - ₱35,000/month",
-                                midCareer: "₱50,000 - ₱90,000/month",
-                                demand: "Medium-High (85% employment rate)",
-                                specializations: ["Microbiology", "Marine Biology", "Biotechnology", "Ecology", "Genetics"],
-                                certifications: ["Biosafety Officer", "Laboratory Quality Management", "Good Laboratory Practice"],
-                                scholarships: ["DOST-SEI Undergraduate Scholarship", "CHED-PESFA", "Philippine Genome Center Scholarship"]
-                            },
-                            {
-                                rank: 2,
-                                name: "BS Chemistry",
-                                schools: ["University of the Philippines Diliman (Public, ₱45K/year)", "Ateneo de Manila University (Private, ₱110K/year)", "University of Santo Tomas (Private, ₱95K/year)", "Gordon College Olongapo (Public, ₱16K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱50,000 - ₱110,000/year",
-                                entrySalary: "₱23,000 - ₱38,000/month",
-                                midCareer: "₱55,000 - ₱100,000/month",
-                                demand: "Medium (80% employment rate)",
-                                specializations: ["Analytical Chemistry", "Pharmaceutical Chemistry", "Environmental Chemistry", "Food Chemistry", "Industrial Chemistry"],
-                                certifications: ["Chemical Safety Officer", "Quality Control Analyst", "Hazard Analysis Critical Control Point"],
-                                scholarships: ["Philippine Federation of Chemistry Societies", "Unilab Foundation", "PCHRD Research Grant"]
-                            },
-                            {
-                                rank: 3,
-                                name: "BS Environmental Science",
-                                schools: ["University of the Philippines Los Baños (Public, ₱35K/year)", "University of the Philippines Diliman (Public, ₱40K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★", "Central Luzon State University (Public, ₱20K/year)"],
-                                duration: "4 years",
-                                cost: "₱35,000 - ₱90,000/year",
-                                entrySalary: "₱21,000 - ₱33,000/month",
-                                midCareer: "₱45,000 - ₱80,000/month",
-                                demand: "Growing (75% employment rate)",
-                                specializations: ["Environmental Management", "Climate Change Studies", "Conservation Biology", "Environmental Policy", "Sustainable Development"],
-                                certifications: ["Environmental Impact Assessment", "ISO 14001 EMS", "Carbon Footprint Analyst"],
-                                scholarships: ["DENR Scholarship", "WWF Philippines", "ASEAN Foundation"]
-                            }
-                        ]
-                    }
-                }
-            },
-            
-            'HUMSS Hero': {
-                pathways: {
-                    'Helper': {
-                        title: "Social Services & Education Path",
-                        steps: {
-                            step1: "EXCEL in Social Sciences, Psychology, Filipino. Maintain 88+ average. Volunteer at Barangay Health Center (100+ hours). Lead 2 school organizations. Participate in debate competitions. Write for school newspaper.",
-                            step2: "PURSUE BS Psychology at University of Santo Tomas (Tuition: ₱90,000/year) or BS Education at Philippine Normal University (₱30,000/year). Join outreach programs. Get teaching assistant experience. Participate in psychological assessment training.",
-                            step3: "PASS Licensure Exam for Teachers (LET) or Psychologists. Work at DepEd (Teacher I: ₱27,000/month) or DSWD. Pursue Master's in Social Work at UP Diliman. Specialize in counseling or special education."
-                        },
-                        moves: {
-                            move1: "VOLUNTEER at Philippine Red Cross (Makati) or Caritas Manila. Complete 20 hours this month. Join volunteer.ph platform.",
-                            move2: "SHADOW a public school teacher for 3 days. Attend DepEd's career orientation seminar. Join Psychological Association of the Philippines student chapter.",
-                            move3: "REVIEW for LET exam (₱15,000 review center). Apply for Teacher I positions. Build portfolio of lesson plans and teaching materials."
-                        },
-                        skills: ["Communication", "Empathy", "Counseling", "Community Organizing", "Teaching", "Conflict Resolution", "Case Management", "Psychological Assessment", "Curriculum Development", "Public Speaking"],
-                        demand: 88,
-                        growth: 82,
-                        balance: 85,
-                        topCourses: [
-                            {
-                                rank: 1,
-                                name: "BS Psychology",
-                                schools: ["University of Santo Tomas (Private, ₱90K/year)", "University of the Philippines Diliman (Public, ₱45K/year)", "Ateneo de Manila University (Private, ₱120K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱80,000 - ₱120,000/year",
-                                entrySalary: "₱22,000 - ₱35,000/month",
-                                midCareer: "₱45,000 - ₱80,000/month",
-                                demand: "High (88% employment rate)",
-                                specializations: ["Clinical Psychology", "Industrial Psychology", "Educational Psychology", "Counseling Psychology", "Developmental Psychology"],
-                                certifications: ["Registered Psychologist (RP)", "Guidance Counselor", "Human Resource Professional"],
-                                scholarships: ["Psychological Association of the Philippines", "UST Financial Aid", "CHED Scholarship"]
-                            },
-                            {
-                                rank: 2,
-                                name: "Bachelor of Elementary/Secondary Education",
-                                schools: ["Philippine Normal University (Public, ₱30K/year)", "University of the Philippines Diliman (Public, ₱40K/year)", "Gordon College Olongapo (Public, ₱12K/year) ★", "University of Santo Tomas (Private, ₱80K/year)"],
-                                duration: "4 years",
-                                cost: "₱20,000 - ₱50,000/year",
-                                entrySalary: "₱27,000/month (Teacher I)",
-                                midCareer: "₱45,000 - ₱70,000/month",
-                                demand: "Always High (95% employment rate)",
-                                specializations: ["English", "Mathematics", "Science", "Filipino", "Social Studies", "Special Education", "Early Childhood Education"],
-                                certifications: ["Licensed Professional Teacher (LPT)", "National Certificate in Teaching", "TESOL/TEFL"],
-                                scholarships: ["DepEd Scholarship", "PNU Scholarship", "Teachers' Dignity Coalition"]
-                            },
-                            {
-                                rank: 3,
-                                name: "BS Social Work",
-                                schools: ["University of the Philippines Diliman (Public, ₱35K/year)", "University of Santo Tomas (Private, ₱85K/year)", "Polytechnic University of the Philippines (Public, ₱15K/year)", "Gordon College Olongapo (Public, ₱14K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱25,000 - ₱60,000/year",
-                                entrySalary: "₱23,000 - ₱32,000/month",
-                                midCareer: "₱40,000 - ₱65,000/month",
-                                demand: "Medium-High (85% employment rate)",
-                                specializations: ["Community Development", "Child and Family Welfare", "Medical Social Work", "Gerontological Social Work", "Disaster Management"],
-                                certifications: ["Registered Social Worker (RSW)", "Case Management Professional", "Disaster Risk Reduction Management"],
-                                scholarships: ["DSWD Educational Assistance", "Philippine Association of Social Workers", "Caritas Manila Scholarship"]
-                            }
-                        ]
-                    },
-                    'Creative': {
-                        title: "Media & Arts Path",
-                        steps: {
-                            step1: "JOIN school paper as editor-in-chief. Create YouTube channel (1,000+ subscribers). Win essay writing contests. Build portfolio with 10+ published works. Take photography/videography workshops.",
-                            step2: "PURSUE AB Communication at UP Diliman (Tuition: ₱45,000/year) or Mass Communication at Lyceum (₱70,000/year). Join campus TV/radio. Intern at ABS-CBN or GMA Network (₱10,000/month allowance). Build professional network.",
-                            step3: "BUILD professional portfolio with 50+ published works. Network at Manila International Book Fair. Consider Master's in Journalism at Ateneo. Start freelance business or join media agency."
-                        },
-                        moves: {
-                            move1: "START blog about Philippine culture (10 articles this month). Create 5 YouTube videos about local issues. Join Writers' Bloc Philippines workshop.",
-                            move2: "ATTEND Manila International Book Fair (September). Network with 10 media professionals. Build portfolio on Behance/Instagram.",
-                            move3: "APPLY for entry-level reporter position at major networks (₱18,000-₱25,000). Build network of 100+ media contacts. Start freelance writing/design business."
-                        },
-                        skills: ["Writing", "Video Editing", "Social Media Management", "Public Speaking", "Storytelling", "Adobe Creative Suite", "Photography", "Content Strategy", "Digital Marketing", "SEO Optimization"],
-                        demand: 78,
-                        growth: 85,
-                        balance: 80,
-                        topCourses: [
-                            {
-                                rank: 1,
-                                name: "AB Communication / Mass Communication",
-                                schools: ["University of the Philippines Diliman (Public, ₱45K/year)", "Ateneo de Manila University (Private, ₱110K/year)", "Lyceum of the Philippines University (Private, ₱70K/year)", "Gordon College Olongapo (Public, ₱14K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱45,000 - ₱90,000/year",
-                                entrySalary: "₱18,000 - ₱28,000/month",
-                                midCareer: "₱40,000 - ₱80,000/month",
-                                demand: "Medium (78% employment rate)",
-                                specializations: ["Journalism", "Broadcast Communication", "Public Relations", "Advertising", "Development Communication"],
-                                certifications: ["Google Analytics Certification", "HubSpot Content Marketing", "Facebook Blueprint"],
-                                scholarships: ["Kapisanan ng mga Brodkaster ng Pilipinas", "Philippine Press Institute", "ABS-CBN Foundation"]
-                            },
-                            {
-                                rank: 2,
-                                name: "Bachelor of Fine Arts",
-                                schools: ["University of the Philippines Diliman (Public, ₱40K/year)", "University of Santo Tomas (Private, ₱85K/year)", "Gordon College Olongapo (Public, ₱13K/year) ★", "De La Salle - College of Saint Benilde (Private, ₱120K/year)"],
-                                duration: "4 years",
-                                cost: "₱40,000 - ₱80,000/year",
-                                entrySalary: "₱20,000 - ₱30,000/month",
-                                midCareer: "₱45,000 - ₱90,000/month",
-                                demand: "Medium (75% employment rate)",
-                                specializations: ["Visual Communication", "Industrial Design", "Painting", "Sculpture", "Photography"],
-                                certifications: ["Adobe Certified Professional", "Autodesk Certified User", "Digital Marketing Certification"],
-                                scholarships: ["National Commission for Culture and the Arts", "Metrobank Foundation", "Ayala Foundation"]
-                            },
-                            {
-                                rank: 3,
-                                name: "BS Multimedia Arts",
-                                schools: ["De La Salle - College of Saint Benilde (Private, ₱150K/year)", "Mapúa University (Private, ₱130K/year)", "University of Santo Tomas (Private, ₱100K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱80,000 - ₱150,000/year",
-                                entrySalary: "₱25,000 - ₱40,000/month",
-                                midCareer: "₱60,000 - ₱120,000/month",
-                                demand: "Growing (82% employment rate)",
-                                specializations: ["Animation", "Game Design", "Digital Film", "Motion Graphics", "User Interface Design"],
-                                certifications: ["Toon Boom Harmony", "Unity Certified Developer", "Autodesk Maya Certified"],
-                                scholarships: ["Animation Council of the Philippines", "Game Developers Association", "Film Development Council"]
-                            }
-                        ]
-                    }
-                }
-            },
-            
-            'ABM Hustler': {
-                pathways: {
-                    'Boss': {
-                        title: "Entrepreneurship & Management Path",
-                        steps: {
-                            step1: "START e-commerce business (₱10,000 capital). Achieve ₱50,000 sales in 6 months. Join Junior Achievement Philippines. Master accounting principles (90+ in ABM subjects). Network with local entrepreneurs.",
-                            step2: "PURSUE BS Business Administration at De La Salle University (Tuition: ₱120,000/year) or Entrepreneurship at Ateneo (₱110,000/year). Join AIESEC. Intern at startup like PayMongo (₱15,000/month stipend). Develop business plan.",
-                            step3: "JOIN QBO Innovation Hub incubator. Secure ₱500,000 startup funding from DTI or investors. Build team of 5+ members. Launch minimum viable product. Scale business regionally."
-                        },
-                        moves: {
-                            move1: "READ 'The Lean Startup' by Eric Ries. Complete DTI Negosyo Center online course (Free). Create business model canvas for your idea.",
-                            move2: "INTERVIEW 3 successful Filipino entrepreneurs. Attend GoNegosyo seminar at SM Megamall. Join Philippine Chamber of Commerce and Industry youth program.",
-                            move3: "LAUNCH MVP with ₱50,000 capital. Join Philippine Startup Week (November). Apply for DTI Shared Service Facilities."
-                        },
-                        skills: ["Financial Management", "Marketing Strategy", "Negotiation", "Leadership", "Strategic Planning", "Digital Marketing", "Business Analytics", "Supply Chain Management", "Customer Relationship Management", "Project Management"],
-                        demand: 90,
-                        growth: 95,
-                        balance: 65,
-                        topCourses: [
-                            {
-                                rank: 1,
-                                name: "BS Business Administration",
-                                schools: ["De La Salle University (Private, ₱120K/year)", "Ateneo de Manila University (Private, ₱110K/year)", "University of the Philippines Diliman (Public, ₱50K/year)", "Gordon College Olongapo (Public, ₱14K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱100,000 - ₱140,000/year",
-                                entrySalary: "₱25,000 - ₱40,000/month",
-                                midCareer: "₱80,000 - ₱200,000/month",
-                                demand: "High (90% employment rate)",
-                                specializations: ["Marketing Management", "Operations Management", "Human Resource Management", "Financial Management", "Business Economics"],
-                                certifications: ["Project Management Professional (PMP)", "Six Sigma Green Belt", "Salesforce Administrator"],
-                                scholarships: ["Management Association of the Philippines", "Philippine Business for Education", "GoNegosyo Scholarship"]
-                            },
-                            {
-                                rank: 2,
-                                name: "BS Entrepreneurship",
-                                schools: ["Ateneo de Manila University (Private, ₱110K/year)", "University of the Philippines Diliman (Public, ₱45K/year)", "Gordon College Olongapo (Public, ₱13K/year) ★", "University of Asia and the Pacific (Private, ₱130K/year)"],
-                                duration: "4 years",
-                                cost: "₱50,000 - ₱110,000/year",
-                                entrySalary: "₱22,000 - ₱35,000/month",
-                                midCareer: "₱70,000 - ₱150,000/month (or business owner)",
-                                demand: "Medium-High (85% employment rate)",
-                                specializations: ["Small Business Management", "Social Entrepreneurship", "Family Business", "Tech Entrepreneurship", "Franchise Management"],
-                                certifications: ["Entrepreneurship Development Program", "DTI Business Counseling", "Franchise Consulting"],
-                                scholarships: ["GoNegosyo Mentorship Program", "DTI Entrepreneurship Training", "Philippine Center for Entrepreneurship"]
-                            },
-                            {
-                                rank: 3,
-                                name: "BS Accountancy",
-                                schools: ["University of Santo Tomas (Private, ₱90K/year)", "University of the East (Private, ₱70K/year)", "De La Salle University (Private, ₱100K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱60,000 - ₱100,000/year",
-                                entrySalary: "₱28,000 - ₱45,000/month",
-                                midCareer: "₱100,000 - ₱250,000/month",
-                                demand: "Very High (95% employment rate)",
-                                specializations: ["Auditing", "Taxation", "Management Accounting", "Forensic Accounting", "Government Accounting"],
-                                certifications: ["Certified Public Accountant (CPA)", "Certified Management Accountant (CMA)", "Certified Internal Auditor (CIA)"],
-                                scholarships: ["Philippine Institute of CPAs", "SGV Foundation", "PwC Philippines Scholarship"]
-                            }
-                        ]
-                    },
-                    'Helper': {
-                        title: "Corporate & Finance Path",
-                        steps: {
-                            step1: "MASTER Accounting principles (95+ average). Join Business Club. Win local accounting competition. Complete internship at local accounting firm. Learn Excel advanced functions.",
-                            step2: "PURSUE BS Accountancy at University of the East (Tuition: ₱70,000/year) or BSA at UST (₱90,000/year). Pass accounting competitions. Intern at PwC Philippines (₱20,000/month allowance). Join Junior Philippine Institute of Accountants.",
-                            step3: "PASS CPA board exam (70% passing rate). Work at Big 4 accounting firms (PwC, SGV, KPMG, EY). Pursue MBA after 3 years experience. Specialize in audit, tax, or advisory."
-                        },
-                        moves: {
-                            move1: "COMPLETE free accounting tutorials on YouTube. Practice bookkeeping for 2 small businesses. Master Excel pivot tables and VLOOKUP.",
-                            move2: "ATTEND PICPA student conference. Network with 10 CPAs on LinkedIn. Join accounting webinars from PwC/Deloitte.",
-                            move3: "ENROLL in CPA review center (₱15,000). Target entry salary of ₱25,000-₱30,000 at auditing firms. Prepare for Civil Service Exam for government accounting positions."
-                        },
-                        skills: ["Accounting", "Taxation", "Auditing", "Excel Advanced", "Financial Analysis", "QuickBooks", "SAP", "Internal Controls", "Financial Reporting", "Budgeting"],
-                        demand: 92,
-                        growth: 88,
-                        balance: 70,
-                        topCourses: [
-                            {
-                                rank: 1,
-                                name: "BS Accountancy",
-                                schools: ["University of Santo Tomas (Private, ₱90K/year)", "University of the East (Private, ₱70K/year)", "De La Salle University (Private, ₱100K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱60,000 - ₱100,000/year",
-                                entrySalary: "₱28,000 - ₱45,000/month",
-                                midCareer: "₱100,000 - ₱250,000/month",
-                                demand: "Very High (95% employment rate)",
-                                specializations: ["Auditing", "Taxation", "Management Accounting", "Forensic Accounting", "Government Accounting"],
-                                certifications: ["Certified Public Accountant (CPA)", "Certified Management Accountant (CMA)", "Certified Internal Auditor (CIA)"],
-                                scholarships: ["Philippine Institute of CPAs", "SGV Foundation", "PwC Philippines Scholarship"]
-                            },
-                            {
-                                rank: 2,
-                                name: "BS Banking and Finance",
-                                schools: ["University of the Philippines Diliman (Public, ₱50K/year)", "De La Salle University (Private, ₱110K/year)", "Gordon College Olongapo (Public, ₱14K/year) ★", "University of Santo Tomas (Private, ₱85K/year)"],
-                                duration: "4 years",
-                                cost: "₱50,000 - ₱90,000/year",
-                                entrySalary: "₱23,000 - ₱38,000/month",
-                                midCareer: "₱70,000 - ₱150,000/month",
-                                demand: "High (90% employment rate)",
-                                specializations: ["Investment Banking", "Corporate Finance", "Risk Management", "Wealth Management", "Financial Technology"],
-                                certifications: ["Chartered Financial Analyst (CFA)", "Financial Risk Manager (FRM)", "Certified Financial Planner (CFP)"],
-                                scholarships: ["Bankers Association of the Philippines", "Bangko Sentral ng Pilipinas", "Metrobank Foundation"]
-                            },
-                            {
-                                rank: 3,
-                                name: "BS Economics",
-                                schools: ["University of the Philippines Diliman (Public, ₱45K/year)", "Ateneo de Manila University (Private, ₱100K/year)", "University of Santo Tomas (Private, ₱85K/year)", "Gordon College Olongapo (Public, ₱14K/year) ★"],
-                                duration: "4 years",
-                                cost: "₱45,000 - ₱100,000/year",
-                                entrySalary: "₱24,000 - ₱40,000/month",
-                                midCareer: "₱65,000 - ₱120,000/month",
-                                demand: "Medium-High (85% employment rate)",
-                                specializations: ["Development Economics", "Financial Economics", "Public Policy", "Environmental Economics", "Labor Economics"],
-                                certifications: ["Economic Development Professional", "Policy Analysis Certification", "Data Analysis for Economists"],
-                                scholarships: ["Philippine Economic Society", "National Economic and Development Authority", "World Bank Scholarship"]
-                            }
-                        ]
-                    }
-                }
-            },
-            
-            'TVL/Tech Master': {
-                pathways: {
-                    'Builder': {
-                        title: "Technical & Vocational Path",
-                        steps: {
-                            step1: "MASTER TVL specialization (ICT, SMAW, Automotive). Get NC II certification from TESDA. Join Skills Philippines competitions. Achieve 95+ in practical exams. Build portfolio of completed projects.",
-                            step2: "ENROLL in TESDA advanced courses (Free). Get OJT at construction company or IT firm. Consider ladderized program at Technological University of the Philippines (₱15,000/year). Get industry certifications.",
-                            step3: "GET NC III/NC IV certification. Specialize in high-demand skills (welding, programming). Start freelance business. Target overseas employment (Japan, Middle East, Singapore)."
-                        },
-                        moves: {
-                            move1: "VISIT nearest TESDA center in your city. Enroll in 3-month free training program. Complete safety orientation.",
-                            move2: "CREATE portfolio of 10 completed projects. Join Philippine Constructors Association events. Network with skilled workers in your field.",
-                            move3: "TARGET overseas employment with ₱50,000+ monthly salary. Get specialized certification in your field. Prepare for Technical Education and Skills Development Authority assessment."
-                        },
-                        skills: ["Technical Drawing", "Equipment Operation", "Quality Control", "Safety Procedures", "Troubleshooting", "CAD Software", "Preventive Maintenance", "Material Knowledge", "Blueprint Reading", "Workshop Management"],
-                        demand: 96,
-                        growth: 90,
-                        balance: 75,
-                        topCourses: [
-                            {
-                                rank: 1,
-                                name: "BS Industrial Technology",
-                                schools: ["Technological University of the Philippines (Public, ₱15K/year)", "Gordon College Olongapo (Public, ₱13K/year) ★", "Polytechnic University of the Philippines (Public, ₱12K/year)", "Central Luzon State University (Public, ₱16K/year)"],
-                                duration: "4 years",
-                                cost: "₱15,000 - ₱40,000/year",
-                                entrySalary: "₱22,000 - ₱35,000/month",
-                                midCareer: "₱45,000 - ₱80,000/month",
-                                demand: "Very High (96% employment rate)",
-                                specializations: ["Automotive Technology", "Electronics Technology", "Food Technology", "Garments Technology", "Drafting Technology"],
-                                certifications: ["TESDA National Certificate (NC II-IV)", "ASE Automotive Certification", "ISO Quality Management"],
-                                scholarships: ["TESDA Training for Work Scholarship", "Dual Training System", "Industry Partnership Programs"]
-                            },
-                            {
-                                rank: 2,
-                                name: "BS Information Systems",
-                                schools: ["University of the Philippines Diliman (Public, ₱50K/year)", "Ateneo de Manila University (Private, ₱100K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★", "University of Santo Tomas (Private, ₱85K/year)"],
-                                duration: "4 years",
-                                cost: "₱50,000 - ₱100,000/year",
-                                entrySalary: "₱23,000 - ₱38,000/month",
-                                midCareer: "₱60,000 - ₱110,000/month",
-                                demand: "High (92% employment rate)",
-                                specializations: ["Business Analytics", "Database Management", "Systems Analysis", "Enterprise Resource Planning", "Information Security"],
-                                certifications: ["CompTIA IT Fundamentals", "Microsoft Certified: Azure Data Fundamentals", "SAP Certification"],
-                                scholarships: ["DICT Tech-Voc Scholarship", "Microsoft Philanthropies", "Oracle Academy"]
-                            },
-                            {
-                                rank: 3,
-                                name: "TESDA Technical Programs",
-                                schools: ["TESDA Training Centers (Various locations, FREE)", "Gordon College TESDA Center (Olongapo, FREE) ★", "Don Bosco Technical College (Makati, ₱30K)", "MFI Foundation (Quezon City, ₱25K)"],
-                                duration: "6 months - 2 years",
-                                cost: "FREE to ₱30,000",
-                                entrySalary: "₱18,000 - ₱30,000/month",
-                                midCareer: "₱35,000 - ₱70,000/month (local) / ₱50,000 - ₱150,000/month (overseas)",
-                                demand: "Very High (98% employment rate)",
-                                specializations: ["Welding NC II/III", "Computer Systems Servicing NC II", "Automotive Servicing NC II", "Electrical Installation NC II", "Cookery NC II"],
-                                certifications: ["TESDA National Certificate", "ASE Certification", "International Welding Certificates"],
-                                scholarships: ["TESDA Scholarship (100% free)", "Dual Training System", "Private Sector Sponsorships"]
-                            }
-                        ]
-                    }
-                }
-            },
-            
-            'Still Figuring It Out': {
-                pathways: {
-                    'Explorer': {
-                        title: "Career Exploration Path",
-                        steps: {
-                            step1: "TAKE 3 career assessment tests (Holland Code, MBTI, StrengthsFinder). Shadow 3 different professionals. Join 4 different school clubs. Maintain 85+ average in all subjects. Explore various interests.",
-                            step2: "CONSIDER BS Psychology at PUP (₱15,000/year) for career counseling exposure. Take personality tests. Join career orientation programs at DOLE. Try online courses in different fields.",
-                            step3: "TRY internships in 3 different fields. Identify top 3 career interests based on experience. Pursue further education in chosen field. Consider double major or minor programs."
-                        },
-                        moves: {
-                            move1: "COMPLETE free career assessment at DOLE website. List 15 things you enjoy doing. Take free online personality tests.",
-                            move2: "INTERVIEW people from 5 different industries. Attend 3 career orientation seminars. Join LinkedIn groups for various professions.",
-                            move3: "ENROLL in 3 different short courses (Coursera/edX) to test interests. Create career decision matrix. Volunteer in different settings."
-                        },
-                        skills: ["Self-Assessment", "Research", "Networking", "Decision Making", "Adaptability", "Critical Thinking", "Time Management", "Information Synthesis", "Career Planning", "Personal Branding"],
-                        demand: 75,
-                        growth: 80,
-                        balance: 90,
-                        topCourses: [
-                            {
-                                rank: 1,
-                                name: "BS Psychology",
-                                schools: ["Polytechnic University of the Philippines (Public, ₱15K/year)", "Gordon College Olongapo (Public, ₱15K/year) ★", "University of the Philippines Diliman (Public, ₱45K/year)", "University of Santo Tomas (Private, ₱90K/year)"],
-                                duration: "4 years",
-                                cost: "₱15,000 - ₱50,000/year",
-                                entrySalary: "₱22,000 - ₱35,000/month",
-                                midCareer: "₱45,000 - ₱80,000/month",
-                                demand: "High (88% employment rate)",
-                                specializations: ["General Psychology", "Industrial Psychology", "Counseling Psychology", "Educational Psychology", "Social Psychology"],
-                                certifications: ["Career Assessment Specialist", "Life Coaching Certification", "Human Resource Management"],
-                                scholarships: ["PUP Open University", "CHED Expanded Tertiary Education", "Private Counseling Centers"]
-                            },
-                            {
-                                rank: 2,
-                                name: "BS Development Communication",
-                                schools: ["University of the Philippines Los Baños (Public, ₱35K/year)", "Gordon College Olongapo (Public, ₱14K/year) ★", "Polytechnic University of the Philippines (Public, ₱15K/year)", "University of the Philippines Open University (Online)"],
-                                duration: "4 years",
-                                cost: "₱20,000 - ₱60,000/year",
-                                entrySalary: "₱21,000 - ₱33,000/month",
-                                midCareer: "₱40,000 - ₱70,000/month",
-                                demand: "Medium (75% employment rate)",
-                                specializations: ["Community Development", "Social Marketing", "Environmental Communication", "Science Communication", "Health Communication"],
-                                certifications: ["Community Development Worker", "Social Media for Development", "Monitoring and Evaluation"],
-                                scholarships: ["Department of Social Welfare and Development", "Philippine Communication Society", "ASEAN Foundation"]
-                            },
-                            {
-                                rank: 3,
-                                name: "General Education / Associate Degrees",
-                                schools: ["Gordon College Olongapo (Public, ₱10K/year) ★", "City College of Angeles (Public, ₱12K/year)", "Polytechnic University of the Philippines (Public, ₱10K/year)", "Community Colleges (Various)"],
-                                duration: "2 years",
-                                cost: "₱10,000 - ₱30,000/year",
-                                entrySalary: "₱18,000 - ₱25,000/month",
-                                midCareer: "Variable depending on further education",
-                                demand: "Variable",
-                                specializations: ["General Education", "Liberal Arts", "Associate in Arts", "Associate in Science", "Career Exploration"],
-                                certifications: ["Career Readiness Certificate", "Basic Employability Skills", "Industry-specific certifications"],
-                                scholarships: ["Local Government Scholarships", "CHED Transitory Program", "Private Sector Sponsorships"]
-                            }
-                        ]
-                    }
-                }
-            }
-        };
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
 
-        // EXTENSIVE LOCAL OPPORTUNITIES DATABASE
-        const localOpportunities = {
-            'NCR': {
-                provinces: ["Metro Manila", "Quezon City", "Manila", "Makati", "Taguig", "Pasig", "Mandaluyong", "Pasay", "Marikina", "Parañaque", "Las Piñas", "Muntinlupa", "Valenzuela", "Caloocan", "Malabon", "Navotas", "San Juan"],
-                companies: [
-                    "Accenture Philippines - BPO & IT Services (₱25,000-₱50,000 entry salary)",
-                    "J.P. Morgan Chase & Co. - Finance & Banking (₱35,000-₱60,000 entry)",
-                    "Procter & Gamble Philippines - FMCG (₱40,000-₱65,000 Management Trainee program)",
-                    "SM Investments Corporation - Retail & Real Estate (₱25,000-₱45,000)",
-                    "Ayala Corporation - Conglomerate (₱30,000-₱55,000)",
-                    "Globe Telecom - Telecommunications (₱28,000-₱50,000)",
-                    "ABS-CBN Corporation - Media & Entertainment (₱20,000-₱35,000)",
-                    "Manila Water Company - Utilities (₱25,000-₱40,000)",
-                    "Shell Philippines - Oil & Gas (₱30,000-₱52,000)",
-                    "San Miguel Corporation - Food & Beverage (₱26,000-₱45,000)"
-                ],
-                schools: [
-                    "University of the Philippines Diliman - Public, ₱50,000/year",
-                    "Ateneo de Manila University - Private, ₱120,000/year",
-                    "De La Salle University - Private, ₱110,000/year",
-                    "University of Santo Tomas - Private, ₱90,000/year",
-                    "Mapúa University - Private, ₱120,000/year",
-                    "Polytechnic University of the Philippines - Public, ₱15,000/year",
-                    "Philippine Normal University - Public, ₱30,000/year",
-                    "University of the Philippines Manila - Public, ₱45,000/year",
-                    "Far Eastern University - Private, ₱85,000/year",
-                    "University of the East - Private, ₱70,000/year"
-                ],
-                training: [
-                    "TESDA NCR Training Centers - Free technical courses (20+ locations)",
-                    "DICT Digital Jobs PH Program - Free coding bootcamps",
-                    "AIM Executive Education - Professional development programs",
-                    "UP Open University - Online degree programs",
-                    "PCC Foundation Courses - Accounting certifications",
-                    "Coursera Community Hubs - Free online course access",
-                    "Google Digital Garage - Free digital marketing training",
-                    "Facebook Blueprint - Social media marketing certification"
-                ]
-            },
-            'Region III': {
-                provinces: ["Pampanga", "Bulacan", "Tarlac", "Zambales", "Bataan", "Nueva Ecija", "Aurora"],
-                companies: [
-                    "Texas Instruments Philippines (Clark) - Semiconductor (₱28,000-₱45,000 entry)",
-                    "Philippine Airlines (Clark Airport) - Aviation (₱25,000-₱40,000)",
-                    "San Miguel Foods (Pampanga) - Food Manufacturing (₱22,000-₱38,000)",
-                    "Mitsubishi Motors Philippines (Pampanga) - Automotive (₱24,000-₱42,000)",
-                    "Nestlé Philippines (Bulacan) - FMCG (₱26,000-₱44,000)",
-                    "Converge ICT Solutions (Pampanga) - Telecom (₱25,000-₱40,000)",
-                    "Clark Development Corporation - Government (₱27,000-₱38,000)",
-                    "Subic Bay Metropolitan Authority - Freeport (₱26,000-₱43,000)",
-                    "Petron Bataan Refinery - Oil & Gas (₱28,000-₱46,000)",
-                    "RCBC Savings Bank (Region III branches) - Banking (₱23,000-₱37,000)"
-                ],
-                schools: [
-                    "Gordon College Olongapo - Public, ₱15,000/year ★ TOP RECOMMENDATION",
-                    "Holy Angel University (Pampanga) - Private, ₱70,000/year",
-                    "University of the Assumption (Pampanga) - Private, ₱65,000/year",
-                    "Central Luzon State University (Nueva Ecija) - Public, ₱20,000/year",
-                    "Tarlac State University - Public, ₱18,000/year",
-                    "Bulacan State University - Public, ₱17,000/year",
-                    "Pampanga State Agricultural University - Public, ₱16,000/year",
-                    "City College of Angeles - Public, ₱14,000/year",
-                    "Don Bosco Technical College (Pampanga) - Private, ₱80,000/year",
-                    "University of the Philippines Clark - Public, ₱25,000/year (opening 2024)",
-                    "Philippine State College of Aeronautics (Basa Air Base) - Public, ₱22,000/year"
-                ],
-                training: [
-                    "TESDA Region III Centers - Free technical training (15+ locations)",
-                    "Clark Development Corporation Training Institute",
-                    "DOST Region III Innovation Hub - Technology training",
-                    "Pampanga Agriculture Office - Agri-tech programs",
-                    "Subic Bay Freeport Zone Skills Training Center",
-                    "Gordon College TESDA Center - Olongapo ★",
-                    "Central Luzon TVET Centers - Various locations",
-                    "DICT Region III Digital Transformation Center",
-                    "DTI Region III Negosyo Centers - Entrepreneurship training",
-                    "PSA Region III - Data analytics training"
-                ]
-            }
-        };
+    <!-- QUIZ -->
+    <div class="quiz-container" id="quizSection">
+      <!-- Q1 -->
+      <div class="question-card active" id="question1">
+        <div class="question-number">Question 1 of 7</div>
+        <h2 class="question-text">What’s your senior high track/strand?</h2>
+        <div class="options-grid">
+          <button class="option-btn" onclick="selectAndProgress(1, 'STEM', this)">
+            <i class="fa-solid fa-microscope" style="color:#a21caf; margin-right:8px;"></i>
+            STEM <small>Science, math, engineering, tech</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(1, 'HUMSS', this)">
+            <i class="fa-solid fa-landmark" style="color:#a21caf; margin-right:8px;"></i>
+            HUMSS <small>Society, communication, public service</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(1, 'ABM', this)">
+            <i class="fa-solid fa-chart-line" style="color:#a21caf; margin-right:8px;"></i>
+            ABM <small>Business, accounting, entrepreneurship</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(1, 'TVL', this)">
+            <i class="fa-solid fa-screwdriver-wrench" style="color:#a21caf; margin-right:8px;"></i>
+            TVL <small>Hands-on technical and vocational</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(1, 'Undecided', this)">
+            <i class="fa-solid fa-magnifying-glass" style="color:#a21caf; margin-right:8px;"></i>
+            Undecided <small>Exploring options</small>
+          </button>
+        </div>
+        <div class="helper-row">
+          <span class="chip"><i class="fa-solid fa-hand-pointer"></i> Tap to continue</span>
+          <span></span>
+        </div>
+      </div>
 
-        // GORDON COLLEGE DETAILED INFORMATION
-        const gordonCollegeInfo = {
-            name: "Gordon College Olongapo",
-            location: "Olongapo City, Zambales",
-            type: "Public College",
-            established: "1969",
-            president: "Dr. Shiela B. Reyes",
-            website: "https://gordoncollege.edu.ph",
-            contact: "(047) 222-7750",
-            email: "info@gordoncollege.edu.ph",
-            facebook: "Gordon College Olongapo",
-            
-            keyFeatures: [
-                "ISO 9001:2015 Certified Quality Management System",
-                "TESDA-accredited training center on campus",
-                "Affordable quality education (₱15,000/year average tuition)",
-                "Strong industry partnerships with 50+ companies",
-                "Ladderized programs available",
-                "Scholarship programs for indigent students",
-                "Modern facilities and laboratories",
-                "100% passing rate in some licensure exams",
-                "Active research and extension programs",
-                "International linkages and partnerships"
-            ],
-            
-            topPrograms: [
-                {
-                    name: "BS Information Technology",
-                    duration: "4 years",
-                    tuition: "₱15,000/year",
-                    features: ["Cisco Networking Academy", "Industry immersion program", "Job placement assistance", "Modern computer laboratories", "Partnership with tech companies"],
-                    certifications: ["TESDA NC II/III embedded", "Industry-recognized certifications", "Microsoft Office Specialist"],
-                    employment: "95% employment rate within 6 months"
-                },
-                {
-                    name: "BS Business Administration",
-                    duration: "4 years",
-                    tuition: "₱14,000/year",
-                    features: ["Entrepreneurship focus", "Accounting laboratory", "Business plan competition", "Industry partnerships", "Incubation center"],
-                    certifications: ["Business Process Outsourcing", "Entrepreneurship Development", "Digital Marketing"],
-                    employment: "92% employment rate within 6 months"
-                },
-                {
-                    name: "BS Industrial Technology",
-                    duration: "4 years",
-                    tuition: "₱13,000/year",
-                    features: ["TESDA NC II embedded", "Hands-on training", "Industry certification", "Modern workshops", "Apprenticeship programs"],
-                    certifications: ["TESDA National Certificates", "Safety Officer Certification", "Equipment Operation"],
-                    employment: "98% employment rate within 3 months"
-                },
-                {
-                    name: "Teacher Education programs",
-                    duration: "4 years",
-                    tuition: "₱12,000/year",
-                    features: ["LET review integrated", "Teaching internship", "DepEd partnership", "Modern teaching laboratories", "Community extension"],
-                    certifications: ["Licensure Exam for Teachers", "Teaching Competencies", "Classroom Management"],
-                    employment: "100% passing rate in recent LET exams"
-                }
-            ],
-            
-            scholarships: [
-                "CHED Scholarship (Free tuition + ₱10,000/month stipend)",
-                "Gordon College Scholarship (50-100% tuition discount)",
-                "City Government Scholarship (Olongapo residents)",
-                "Private Sector Scholarships (SM Foundation, Metrobank, etc.)",
-                "Academic Scholarship (for top 10% of class)",
-                "Athletic and Cultural Scholarships",
-                "Alumni Association Scholarship",
-                "Special Study Grant for Indigent Students"
-            ],
-            
-            facilities: [
-                "Modern library with online databases",
-                "Computer laboratories with latest equipment",
-                "Science laboratories",
-                "Technical workshops",
-                "Audio-visual rooms",
-                "Sports complex",
-                "Student center",
-                "Research centers",
-                "Incubation center for startups",
-                "TESDA-accredited assessment center"
-            ],
-            
-            achievements: [
-                "ISO 9001:2015 Certified",
-                "PACUCOA Accredited programs",
-                "Top performing school in licensure exams",
-                "Industry partnerships with 50+ companies",
-                "International linkages",
-                "Research awards",
-                "Community service recognition",
-                "Sports achievements",
-                "Cultural awards",
-                "Environmental programs"
-            ]
-        };
+      <!-- Q2 -->
+      <div class="question-card" id="question2">
+        <div class="question-number">Question 2 of 7</div>
+        <h2 class="question-text">Which direction feels most “you”?</h2>
+        <div class="options-grid">
+          <button class="option-btn" onclick="selectAndProgress(2, 'Health', this)">
+            <i class="fa-solid fa-stethoscope" style="color:#a21caf; margin-right:8px;"></i>
+            Health & Care <small>Nursing, med-tech, allied health</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(2, 'Tech', this)">
+            <i class="fa-solid fa-laptop-code" style="color:#a21caf; margin-right:8px;"></i>
+            Tech & Computing <small>IT, CS, cybersecurity, data</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(2, 'Engineering', this)">
+            <i class="fa-solid fa-helmet-safety" style="color:#a21caf; margin-right:8px;"></i>
+            Engineering & Aviation <small>ECE, ME, aviation-related</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(2, 'Business', this)">
+            <i class="fa-solid fa-briefcase" style="color:#a21caf; margin-right:8px;"></i>
+            Business & Finance <small>accounting, management, marketing</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(2, 'Education', this)">
+            <i class="fa-solid fa-chalkboard-user" style="color:#a21caf; margin-right:8px;"></i>
+            Education & Community <small>teaching, public service, social work</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(2, 'Creative', this)">
+            <i class="fa-solid fa-palette" style="color:#a21caf; margin-right:8px;"></i>
+            Media & Creative <small>comm, film, design, writing</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(2, 'SkilledTrades', this)">
+            <i class="fa-solid fa-industry" style="color:#a21caf; margin-right:8px;"></i>
+            Skilled Trades <small>welding, electrical, machining, seafaring</small>
+          </button>
+        </div>
+        <div class="nav-buttons">
+          <button class="nav-btn btn-back" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        </div>
+      </div>
 
-        // Quiz state
-        let currentQuestion = 1;
-        let answers = {};
-        const totalQuestions = 8;
+      <!-- Q3 -->
+      <div class="question-card" id="question3">
+        <div class="question-number">Question 3 of 7</div>
+        <h2 class="question-text">What matters most right now?</h2>
+        <div class="options-grid">
+          <button class="option-btn" onclick="selectAndProgress(3, 'Practical', this)">
+            <i class="fa-solid fa-shield" style="color:#a21caf; margin-right:8px;"></i>
+            Practical & stable <small>job demand + clear path</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(3, 'HighIncome', this)">
+            <i class="fa-solid fa-coins" style="color:#a21caf; margin-right:8px;"></i>
+            Higher income potential <small>willing to grind for growth</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(3, 'Passion', this)">
+            <i class="fa-solid fa-heart" style="color:#a21caf; margin-right:8px;"></i>
+            Strong interest/passion <small>I’ll commit if it fits me</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(3, 'FastTrack', this)">
+            <i class="fa-solid fa-bolt" style="color:#a21caf; margin-right:8px;"></i>
+            Fast track employment <small>TESDA / ladderized / OJT ASAP</small>
+          </button>
+        </div>
+        <div class="nav-buttons">
+          <button class="nav-btn btn-back" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        </div>
+      </div>
 
-        // Initialize
-        updateProgressBar();
+      <!-- Q4 -->
+      <div class="question-card" id="question4">
+        <div class="question-number">Question 4 of 7</div>
+        <h2 class="question-text">Preferred learning style?</h2>
+        <div class="options-grid">
+          <button class="option-btn" onclick="selectAndProgress(4, 'HandsOn', this)">
+            <i class="fa-solid fa-hammer" style="color:#a21caf; margin-right:8px;"></i>
+            Hands-on <small>labs, tools, practical projects</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(4, 'Academic', this)">
+            <i class="fa-solid fa-book-open" style="color:#a21caf; margin-right:8px;"></i>
+            Academic <small>theory, research, exams</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(4, 'Mixed', this)">
+            <i class="fa-solid fa-layer-group" style="color:#a21caf; margin-right:8px;"></i>
+            Mixed <small>balanced theory + practice</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(4, 'WorkBased', this)">
+            <i class="fa-solid fa-person-chalkboard" style="color:#a21caf; margin-right:8px;"></i>
+            Work-based <small>OJT-heavy, industry exposure</small>
+          </button>
+        </div>
+        <div class="nav-buttons">
+          <button class="nav-btn btn-back" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        </div>
+      </div>
 
-        function selectAndProgress(questionNum, value, element) {
-            const questionDiv = document.getElementById(`question${questionNum}`);
-            const buttons = questionDiv.querySelectorAll('.option-btn');
-            buttons.forEach(btn => btn.classList.remove('selected'));
-            
-            element.classList.add('selected');
-            answers[`q${questionNum}`] = value;
-            
-            // Show progress message
-            const progressMsg = questionDiv.querySelector('.auto-progress-indicator');
-            if (progressMsg) {
-                progressMsg.innerHTML = '<i class="fas fa-check-circle"></i> <span>Selected! Moving on...</span>';
-                progressMsg.style.color = '#10b981';
-            }
-            
-            // Auto-progress after delay
-            setTimeout(() => {
-                if (questionNum < totalQuestions) {
-                    nextQuestion();
-                }
-            }, 600);
+      <!-- Q5 -->
+      <div class="question-card" id="question5">
+        <div class="question-number">Question 5 of 7</div>
+        <h2 class="question-text">Any specific course you’re considering?</h2>
+        <input class="input-field" id="courseInterest" placeholder="Type a course/keyword (e.g., Nursing, IT, Engineering, Accountancy)…" oninput="saveTypedCourse()" />
+        <div class="options-grid">
+          <button class="option-btn" onclick="selectAndProgress(5, 'NoSpecific', this)">
+            <i class="fa-solid fa-circle-question" style="color:#a21caf; margin-right:8px;"></i>
+            Not sure yet <small>Recommend based on my answers</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(5, 'HasSpecific', this)">
+            <i class="fa-solid fa-crosshairs" style="color:#a21caf; margin-right:8px;"></i>
+            I have something in mind <small>Use my typed course/keyword</small>
+          </button>
+        </div>
+        <div class="nav-buttons">
+          <button class="nav-btn btn-back" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="question-card" id="question6">
+        <div class="question-number">Question 6 of 7</div>
+        <h2 class="question-text">Where in Olongapo are you from?</h2>
+
+        <select class="input-field" id="barangay" onchange="checkLocationComplete()">
+          <option value="">-- Select Barangay (Olongapo Only) --</option>
+          <option>Barretto</option>
+          <option>East Bajac-Bajac</option>
+          <option>East Tapinac</option>
+          <option>Gordon Heights</option>
+          <option>Kabayuhan</option>
+          <option>Kalaklan</option>
+          <option>Mabayuan</option>
+          <option>New Asinan</option>
+          <option>New Cabalan</option>
+          <option>New Ilalim</option>
+          <option>New Kababae</option>
+          <option>New Kalalake</option>
+          <option>Old Cabalan</option>
+          <option>Pag-asa</option>
+          <option>Sta. Rita</option>
+          <option>West Bajac-Bajac</option>
+          <option>West Tapinac</option>
+        </select>
+
+        <label style="display:flex; gap:10px; align-items:flex-start; margin-top:6px; color: rgba(30,41,59,0.9); font-weight:800;">
+          <input type="checkbox" id="includeNearby" onchange="checkLocationComplete()" style="margin-top:4px; width:18px; height:18px;">
+          <span>
+            Include nearby / specialized options outside Olongapo (e.g., PRMSU, BPSU, PSAU, PhilSCA Pampanga)
+            <div style="font-weight:650; color: rgba(71,85,105,0.9); font-size:0.9rem; margin-top:6px;">
+              If you want a specialized course that’s stronger outside the city (example: Nursing track in bigger campuses), this helps.
+            </div>
+          </span>
+        </label>
+
+        <div class="helper-row" id="locationIndicator">
+          <span class="chip"><i class="fa-solid fa-location-dot"></i> Select barangay to continue</span>
+          <span></span>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="nav-btn btn-back" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+          <button class="nav-btn btn-generate" id="generateBtn" onclick="generateRoadmap()" disabled>
+            <i class="fa-solid fa-rocket"></i> Generate
+          </button>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="question-card" id="question7">
+        <div class="question-number">Question 7 of 7</div>
+        <h2 class="question-text">Final check: what outcome do you want?</h2>
+        <div class="options-grid">
+          <button class="option-btn" onclick="selectAndProgress(7, 'TopCourses', this)">
+            <i class="fa-solid fa-graduation-cap" style="color:#a21caf; margin-right:8px;"></i>
+            Strong course matches <small>Focus on course recommendations</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(7, 'SchoolOptions', this)">
+            <i class="fa-solid fa-school" style="color:#a21caf; margin-right:8px;"></i>
+            More school choices <small>Wide selection of schools near you</small>
+          </button>
+          <button class="option-btn" onclick="selectAndProgress(7, 'WorkAndSkills', this)">
+            <i class="fa-solid fa-toolbox" style="color:#a21caf; margin-right:8px;"></i>
+            Work + skills first <small>Companies, roles, training, certifications</small>
+          </button>
+        </div>
+        <div class="nav-buttons">
+          <button class="nav-btn btn-back" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RESULTS -->
+    <div class="result-container" id="resultSection">
+      <div class="result-header">
+        <h2><i class="fa-solid fa-map"></i> Your Pathfinder Results</h2>
+        <p id="resultSubtitle">Personalized for Olongapo City</p>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fa-solid fa-bullseye"></i> Recommended Course Tracks</h3>
+        <p id="courseSummary">Loading…</p>
+        <div class="course-grid" id="courseCards"></div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fa-solid fa-school"></i> Schools & Universities (based on your choice)</h3>
+        <p class="muted" id="schoolHint">We prioritize Olongapo. If you enabled “nearby/specialized,” we also add strong nearby options.</p>
+        <ul class="list" id="schoolsList"></ul>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fa-solid fa-briefcase"></i> Local Opportunities & Why They Fit</h3>
+        <p class="muted" id="companyHint">We’ll show examples of nearby industries and how they match your selected track.</p>
+        <ul class="list" id="companiesList"></ul>
+      </div>
+
+      <button class="restart-btn" onclick="restartQuiz()"><i class="fa-solid fa-rotate-right"></i> Take the Quiz Again</button>
+
+      <div class="footer-note">
+        PATHFINDER is a guide tool — always verify admission requirements and offerings on each school’s official pages.
+      </div>
+    </div>
+  </div>
+
+<script>
+/* -----------------------------
+   DATA: COURSES (expanded)
+--------------------------------*/
+const courseCatalog = [
+  // HEALTH
+  { id:"Nursing", tags:["Health","Practical","HighIncome","Academic","Mixed"], shs:["STEM","HUMSS","ABM","TVL","Undecided"],
+    desc:"Patient care, clinical skills, hospital/community practice. Strong demand but requires commitment and board exam path (where applicable).",
+    sampleRoles:["Staff Nurse","Community Health Nurse","Clinic Nurse"],
+    certifications:["BLS/CPR (basic)","Basic infection prevention (training)"]
+  },
+  { id:"Medical Technology / MedTech", tags:["Health","HighIncome","Academic"], shs:["STEM","Undecided"],
+    desc:"Laboratory science: diagnostics, testing, clinical lab work. Best if you like science + accuracy.",
+    sampleRoles:["Medical Technologist","Lab Analyst"],
+    certifications:["Lab safety training","Quality management basics"]
+  },
+  { id:"Pharmacy", tags:["Health","HighIncome","Academic"], shs:["STEM","Undecided"],
+    desc:"Medicines, patient counseling, hospital/retail pharmacy systems.",
+    sampleRoles:["Pharmacist (licensed)","Pharmacy Assistant (path)"],
+    certifications:["Medication safety training"]
+  },
+  { id:"Physical Therapy / Rehab Science", tags:["Health","Passion","Mixed"], shs:["STEM","HUMSS","Undecided"],
+    desc:"Rehabilitation and mobility improvement. Best for hands-on care + anatomy interest.",
+    sampleRoles:["Physical Therapist (licensed)","Rehab aide (path)"],
+    certifications:["Basic sports injury prevention (training)"]
+  },
+
+  // TECH
+  { id:"Information Technology (IT)", tags:["Tech","Practical","HighIncome","Mixed","WorkBased"], shs:["STEM","TVL","Undecided","ABM","HUMSS"],
+    desc:"Systems, networking, web/app development, cybersecurity basics. Strong job market if you build skills + portfolio.",
+    sampleRoles:["IT Support","Web Developer","Network Technician"],
+    certifications:["CompTIA ITF+ (optional)","Cisco intro networking (optional)"]
+  },
+  { id:"Computer Science (CS)", tags:["Tech","HighIncome","Academic"], shs:["STEM","Undecided"],
+    desc:"Programming + theory: algorithms, data structures, software engineering. Great for high-growth careers.",
+    sampleRoles:["Software Engineer","Data Analyst (path)"],
+    certifications:["Cloud fundamentals (optional)","Git/GitHub portfolio"]
+  },
+  { id:"Cybersecurity", tags:["Tech","HighIncome","Practical"], shs:["STEM","TVL","Undecided"],
+    desc:"Security basics, networks, incident response. Strong demand if you build certifications and projects.",
+    sampleRoles:["SOC Analyst (entry)","Security Analyst (path)"],
+    certifications:["Security fundamentals (optional)","Network fundamentals (optional)"]
+  },
+
+  // ENGINEERING / AVIATION
+  { id:"Electronics Engineering / ECE", tags:["Engineering","HighIncome","Academic","Mixed"], shs:["STEM","Undecided"],
+    desc:"Electronics, comms, circuits, embedded systems. Good for industry + aviation electronics track paths.",
+    sampleRoles:["Electronics Engineer","Test Engineer","Field Engineer"],
+    certifications:["Basic soldering + safety","Intro embedded projects"]
+  },
+  { id:"Mechanical Engineering (ME)", tags:["Engineering","HighIncome","Academic"], shs:["STEM","Undecided"],
+    desc:"Machines, design, thermodynamics, manufacturing. Great for plant/shipyard/industrial roles.",
+    sampleRoles:["Maintenance Engineer","Design Engineer (path)"],
+    certifications:["Safety officer training (optional)"]
+  },
+  { id:"Aviation (Aeronautical / Avionics-related)", tags:["Engineering","Practical","WorkBased","HandsOn"], shs:["STEM","TVL","Undecided"],
+    desc:"Aviation-focused programs vary by school: maintenance, avionics, operations. Best with hands-on labs and strict safety discipline.",
+    sampleRoles:["Aviation Technician (path)","Avionics Support (path)"],
+    certifications:["Safety + tool handling","Basic electrical troubleshooting"]
+  },
+
+  // BUSINESS
+  { id:"Accountancy", tags:["Business","HighIncome","Academic","Practical"], shs:["ABM","Undecided"],
+    desc:"Accounting, audit, taxation. Strong long-term stability with licensure path (CPA).",
+    sampleRoles:["Junior Accountant","Audit Associate (path)"],
+    certifications:["Excel advanced (practical)"]
+  },
+  { id:"Business Administration", tags:["Business","Practical","Mixed"], shs:["ABM","HUMSS","Undecided"],
+    desc:"Management, marketing, HR, entrepreneurship. Good broad foundation.",
+    sampleRoles:["Operations Assistant","Marketing Associate"],
+    certifications:["Digital marketing basics"]
+  },
+  { id:"Hospitality Management", tags:["Business","WorkBased","HandsOn"], shs:["ABM","TVL","Undecided"],
+    desc:"Tourism/hospitality operations: hotels, events, customer service.",
+    sampleRoles:["Hotel Front Office","Events Assistant"],
+    certifications:["Food safety basics (training)"]
+  },
+
+  // EDUCATION / COMMUNITY
+  { id:"Education (Elementary/Secondary)", tags:["Education","Practical","Academic"], shs:["HUMSS","ABM","Undecided","STEM","TVL"],
+    desc:"Teaching pathway with internship and licensure route (LET).",
+    sampleRoles:["Teacher (path)","Education aide (path)"],
+    certifications:["Teaching strategies workshops"]
+  },
+  { id:"Psychology", tags:["Education","Health","Academic","Mixed"], shs:["HUMSS","STEM","Undecided"],
+    desc:"Behavior, counseling foundations, research. Can lead to guidance/HR/counseling pathways with further study.",
+    sampleRoles:["HR Staff (path)","Guidance assistant (path)"],
+    certifications:["Basic counseling workshops (optional)"]
+  },
+
+  // CREATIVE
+  { id:"Communication / Media", tags:["Creative","Mixed","WorkBased"], shs:["HUMSS","ABM","Undecided"],
+    desc:"Writing, broadcasting, PR, media production. Best with portfolio and real outputs.",
+    sampleRoles:["Content Writer","Media Assistant"],
+    certifications:["Portfolio building"]
+  },
+  { id:"Multimedia Arts / Design", tags:["Creative","HighIncome","HandsOn"], shs:["HUMSS","TVL","Undecided"],
+    desc:"Graphic design, video, animation basics. Portfolio-heavy field.",
+    sampleRoles:["Graphic Designer","Video Editor (path)"],
+    certifications:["Adobe/Canva skill track (optional)"]
+  },
+
+  // SKILLED TRADES / TVET
+  { id:"TESDA Tech-Voc (NC II/III)", tags:["SkilledTrades","FastTrack","HandsOn","WorkBased"], shs:["TVL","Undecided","ABM","HUMSS","STEM"],
+    desc:"Shorter path to work: welding, electrical, CSS, automotive, etc. Often best for fast employment and overseas pathways.",
+    sampleRoles:["Welder","Electrician","Technician"],
+    certifications:["TESDA NC II/III"]
+  },
+];
+
+/* -----------------------------
+   DATA: SCHOOLS (Olongapo + nearby)
+   Note: include official websites where known.
+--------------------------------*/
+const schoolsDB = [
+  // Olongapo City
+  { name:"Gordon College (Olongapo)", city:"Olongapo", area:"Olongapo", type:"Public", nearbyTier:0,
+    strengths:["IT","Business","Education","Industrial Tech","TVET ladderized"],
+    website:"https://gordoncollege.edu.ph/w3/" },
+  { name:"Columban College, Inc. (Olongapo)", city:"Olongapo", area:"Olongapo", type:"Private", nearbyTier:0,
+    strengths:["Nursing/Health (varies by offering)","Business","Education","Arts/Comm"],
+    website:"https://columban.edu.ph/" },
+  { name:"St. Joseph College–Olongapo, Inc.", city:"Olongapo", area:"Olongapo", type:"Private", nearbyTier:0,
+    strengths:["Education","Business","Health-related (varies)","Community programs"],
+    website:"https://www.sjc-o.com/" },
+
+  // Subic / Freeport (near Olongapo)
+  { name:"The Manila Times College of Subic", city:"Subic Bay Freeport Zone", area:"Near Olongapo", type:"Private", nearbyTier:1,
+    strengths:["Communication/Media","Business","Work-based learning"],
+    website:"https://tmtc.edu.ph/" },
+  { name:"Subic Bay Colleges (SBCI)", city:"Olongapo/Subic area", area:"Near Olongapo", type:"Private", nearbyTier:1,
+    strengths:["Business","Hospitality","Education (varies)","Basic to College"],
+    website:"" },
+
+  // Zambales / Region III near
+  { name:"President Ramon Magsaysay State University (PRMSU)", city:"Zambales", area:"Nearby (Zambales)", type:"Public SUC", nearbyTier:2,
+    strengths:["Engineering","Education","IT","Agriculture/Environment (varies by campus)"],
+    website:"https://www.prmsu.edu.ph/" },
+
+  // Bataan / Pampanga / nearby
+  { name:"Bataan Peninsula State University (BPSU)", city:"Bataan", area:"Nearby (Bataan)", type:"Public SUC", nearbyTier:2,
+    strengths:["Engineering","IT","Business","Education (varies by campus)"],
+    website:"https://www.bpsu.edu.ph/" },
+
+  { name:"Pampanga State Agricultural University (PSAU)", city:"Magalang, Pampanga", area:"Nearby (Pampanga)", type:"Public SUC", nearbyTier:3,
+    strengths:["Agri-related","Engineering/Tech (varies)","Business (varies)"],
+    website:"https://psau.edu.ph/" },
+
+  { name:"Philippine State College of Aeronautics (PhilSCA) – Basa Campus (Pampanga)", city:"Floridablanca, Pampanga", area:"Specialized (Aviation)", type:"Public", nearbyTier:3,
+    strengths:["Aviation","Aeronautics-related","Technical programs (varies)"],
+    website:"https://www.philsca.edu.ph/" },
+];
+
+/* -----------------------------
+   DATA: COMPANIES / INDUSTRIES (Olongapo + Subic area)
+--------------------------------*/
+const industryDB = [
+  {
+    name:"Subic Bay Metropolitan Authority (SBMA) locators",
+    fitTags:["Business","IT","Engineering","SkilledTrades","WorkBased","Practical"],
+    why:"Subic Freeport hosts diverse locators (logistics, services, industrial). Good for internships, operations, and technical roles.",
+    link:"https://sbma.com/"
+  },
+  {
+    name:"Agila Subic Shipyard (formerly Hanjin Subic Shipyard area)",
+    fitTags:["Engineering","SkilledTrades","WorkBased","HandsOn","Practical","HighIncome"],
+    why:"Shipyard/industrial ecosystem: fabrication, electrical, mechanical maintenance, QA/QC, safety roles and technical trades.",
+    link:"https://www.agilasubic.com/"
+  },
+  {
+    name:"Austal Philippines (shipbuilding / sustainment)",
+    fitTags:["Engineering","SkilledTrades","WorkBased","HandsOn","HighIncome"],
+    why:"Shipbuilding & maintenance work supports technical trades and engineering support roles; good for hands-on learners.",
+    link:"https://www.austal.com/philippines"
+  },
+  {
+    name:"Hospital / Clinic Ecosystem (Olongapo–Subic area)",
+    fitTags:["Health","Practical","Academic","Mixed","HighIncome"],
+    why:"Health tracks align with hospitals/clinics and community health programs. Great for Nursing and allied health pathways (verify school offerings).",
+    link:""
+  }
+];
+
+/* -----------------------------
+   QUIZ STATE
+--------------------------------*/
+let currentQuestion = 1;
+let answers = {};
+const totalQuestions = 7;
+
+updateProgressBar();
+
+/* -----------------------------
+   UI HELPERS
+--------------------------------*/
+function selectAndProgress(q, value, el){
+  const card = document.getElementById(`question${q}`);
+  const buttons = card.querySelectorAll('.option-btn');
+  buttons.forEach(b=>b.classList.remove('selected'));
+  if(el) el.classList.add('selected');
+
+  answers[`q${q}`] = value;
+
+  setTimeout(()=>{
+    if(q < totalQuestions){
+      nextQuestion();
+    }
+  }, 500);
+}
+
+function nextQuestion(){
+  document.getElementById(`question${currentQuestion}`).classList.remove('active');
+  currentQuestion++;
+  document.getElementById(`question${currentQuestion}`).classList.add('active');
+  updateProgressBar();
+}
+
+function prevQuestion(){
+  document.getElementById(`question${currentQuestion}`).classList.remove('active');
+  currentQuestion--;
+  document.getElementById(`question${currentQuestion}`).classList.add('active');
+  updateProgressBar();
+}
+
+function updateProgressBar(){
+  const progress = ((currentQuestion - 1) / totalQuestions) * 100;
+  document.getElementById('progressFill').style.width = `${progress}%`;
+}
+
+function saveTypedCourse(){
+  answers.typedCourse = document.getElementById('courseInterest').value.trim();
+}
+
+function checkLocationComplete(){
+  const brgy = document.getElementById('barangay').value;
+  const generateBtn = document.getElementById('generateBtn');
+  const indicator = document.getElementById('locationIndicator');
+
+  if(brgy){
+    generateBtn.disabled = false;
+    generateBtn.style.opacity = '1';
+    indicator.innerHTML = `<span class="chip"><i class="fa-solid fa-check"></i> Ready to generate</span><span></span>`;
+  }else{
+    generateBtn.disabled = true;
+    generateBtn.style.opacity = '0.6';
+    indicator.innerHTML = `<span class="chip"><i class="fa-solid fa-location-dot"></i> Select barangay to continue</span><span></span>`;
+  }
+}
+
+/* -----------------------------
+   SCORING / RECOMMENDATION LOGIC
+--------------------------------*/
+function normalizeText(s){
+  return (s || "").toLowerCase().trim();
+}
+
+function hasAnyTag(course, tags){
+  return tags.some(t => course.tags.includes(t));
+}
+
+function computeCourseScore(course){
+  const strand = answers.q1 || "Undecided";
+  const direction = answers.q2 || "";
+  const priority = answers.q3 || "";
+  const style = answers.q4 || "";
+  const typedMode = answers.q5 || "NoSpecific";
+  const typed = normalizeText(answers.typedCourse || "");
+  let score = 0;
+
+  // Strand affinity
+  if(course.shs.includes(strand)) score += 16;
+  if(strand === "TVL" && course.tags.includes("SkilledTrades")) score += 10;
+  if(strand === "STEM" && (course.tags.includes("Tech") || course.tags.includes("Engineering") || course.tags.includes("Health"))) score += 8;
+  if(strand === "ABM" && course.tags.includes("Business")) score += 8;
+
+  // Direction match
+  score += course.tags.includes(direction) ? 22 : 0;
+
+  // Priority
+  score += course.tags.includes(priority) ? 14 : 0;
+
+  // Learning style
+  score += course.tags.includes(style) ? 10 : 0;
+
+  // Typed keyword boost
+  if(typedMode === "HasSpecific" && typed.length >= 2){
+    const hay = normalizeText(course.id + " " + course.desc + " " + course.tags.join(" "));
+    if(hay.includes(typed)) score += 28;
+  }
+
+  // Mild diversity: don’t let the same few always dominate
+  score += Math.floor(Math.random() * 6); // 0..5
+
+  return score;
+}
+
+function pickTopCourses(){
+  const scored = courseCatalog
+    .map(c => ({...c, _score: computeCourseScore(c)}))
+    .sort((a,b)=> b._score - a._score);
+
+  // Take top pool then shuffle slightly to reduce repetition
+  const pool = scored.slice(0, 8);
+  shuffleInPlace(pool);
+
+  // Ensure variety: at least 2 different main categories if possible
+  const picked = [];
+  const usedDirections = new Set();
+  for(const c of pool){
+    const main = c.tags.find(t => ["Health","Tech","Engineering","Business","Education","Creative","SkilledTrades"].includes(t)) || "Other";
+    if(picked.length < 3){
+      if(picked.length < 2){
+        if(!usedDirections.has(main)){
+          picked.push(c); usedDirections.add(main);
         }
+      }else{
+        picked.push(c);
+      }
+    }
+  }
+  // Fallback if not enough
+  while(picked.length < 3 && pool.length){
+    const c = pool.shift();
+    if(!picked.some(x=>x.id===c.id)) picked.push(c);
+  }
+  return picked.slice(0,3);
+}
 
-        function selectEmojiAndProgress(value, element) {
-            const emojiButtons = document.querySelectorAll('.emoji-btn');
-            emojiButtons.forEach(btn => btn.classList.remove('selected'));
-            
-            element.classList.add('selected');
-            document.getElementById('emojiLabel').textContent = value;
-            answers['q2'] = value;
-            
-            setTimeout(() => {
-                nextQuestion();
-            }, 600);
-        }
+function computeSchoolScore(school, topCourses, includeNearby){
+  const priority = answers.q3 || "";
+  const direction = answers.q2 || "";
+  const typedMode = answers.q5 || "NoSpecific";
+  const typed = normalizeText(answers.typedCourse || "");
+  let score = 0;
 
-        function handleCustomJobEnter(event) {
-            if (event.key === 'Enter' && event.target.value.trim()) {
-                const value = event.target.value.trim();
-                answers['q3'] = value;
-                event.target.style.borderColor = '#10b981';
-                
-                setTimeout(() => {
-                    nextQuestion();
-                }, 600);
-            }
-        }
+  // Tier weight (0 = Olongapo; 1 = near; 2-3 = farther)
+  if(!includeNearby && school.nearbyTier > 0) return -9999; // hard exclude
 
-        function nextQuestion() {
-            // Hide current question
-            document.getElementById(`question${currentQuestion}`).classList.remove('active');
-            
-            // Show next question
-            currentQuestion++;
-            document.getElementById(`question${currentQuestion}`).classList.add('active');
-            
-            updateProgressBar();
-        }
+  // base: prefer Olongapo always
+  score += (school.nearbyTier === 0) ? 30 : (school.nearbyTier === 1 ? 18 : (includeNearby ? 10 : 0));
 
-        function prevQuestion() {
-            document.getElementById(`question${currentQuestion}`).classList.remove('active');
-            currentQuestion--;
-            document.getElementById(`question${currentQuestion}`).classList.add('active');
-            updateProgressBar();
-        }
+  // Match strengths to top courses
+  const courseNames = topCourses.map(c=>normalizeText(c.id));
+  const strengths = school.strengths.map(s=>normalizeText(s));
+  courseNames.forEach(name=>{
+    if(strengths.some(st => st.includes(name.split(" ")[0]))) score += 14;
+  });
 
-        function updateProgressBar() {
-            const progress = ((currentQuestion - 1) / totalQuestions) * 100;
-            document.getElementById('progressFill').style.width = `${progress}%`;
-        }
+  // Direction alignment
+  if(direction === "Health" && strengths.some(s=>s.includes("nurs") || s.includes("health"))) score += 12;
+  if(direction === "Tech" && strengths.some(s=>s.includes("it") || s.includes("cs"))) score += 12;
+  if(direction === "Engineering" && strengths.some(s=>s.includes("eng") || s.includes("avi"))) score += 12;
+  if(direction === "Business" && strengths.some(s=>s.includes("bus"))) score += 12;
+  if(direction === "Education" && strengths.some(s=>s.includes("educ"))) score += 12;
+  if(direction === "Creative" && strengths.some(s=>s.includes("comm") || s.includes("arts"))) score += 12;
+  if(direction === "SkilledTrades" && strengths.some(s=>s.includes("tvet") || s.includes("industrial"))) score += 12;
 
-        function checkLocationComplete() {
-            const region = document.getElementById('regionSelect').value;
-            const city = document.getElementById('cityInput').value.trim();
-            const generateBtn = document.getElementById('generateBtn');
-            
-            if (region && city) {
-                generateBtn.disabled = false;
-                generateBtn.style.opacity = '1';
-                
-                const locationIndicator = document.getElementById('locationIndicator');
-                if (locationIndicator) {
-                    locationIndicator.innerHTML = '<i class="fas fa-check-circle"></i> <span>Ready to generate!</span>';
-                    locationIndicator.style.color = '#10b981';
-                }
-            }
-        }
+  // Priority tweak
+  if(priority === "FastTrack" && strengths.some(s=>s.includes("tvet") || s.includes("industrial"))) score += 10;
 
-        function generateRoadmap() {
-            const region = document.getElementById('regionSelect').value;
-            const city = document.getElementById('cityInput').value.trim();
-            
-            if (!region || !city) {
-                alert('Please select your region and enter your city!');
-                return;
-            }
-            
-            answers['region'] = region;
-            answers['city'] = city;
-            
-            // Show loading state
-            const generateBtn = document.getElementById('generateBtn');
-            const originalText = generateBtn.innerHTML;
-            generateBtn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...';
-            generateBtn.disabled = true;
-            
-            // Generate results
-            setTimeout(() => {
-                document.getElementById('quizSection').style.display = 'none';
-                document.getElementById('resultSection').style.display = 'block';
-                
-                generatePersonalizedContent();
-                showLocalOpportunities(region, city);
-                
-                generateBtn.innerHTML = originalText;
-                generateBtn.disabled = false;
-                
-                // Animate elements
-                animateAllElements();
-            }, 1500);
-        }
+  // Typed keyword mild boost
+  if(typedMode === "HasSpecific" && typed.length >= 2){
+    const hay = normalizeText(school.name + " " + school.strengths.join(" "));
+    if(hay.includes(typed)) score += 10;
+  }
 
-        function generatePersonalizedContent() {
-            const strand = answers.q1 || 'Still Figuring It Out';
-            const dreamJob = answers.q3 || 'Explorer';
-            const moneyNeed = answers.q5 || 'Comfortable';
-            const superpower = answers.q6 || 'Problem-Solving';
-            const reality = answers.q7 || 'Interests No Clue';
-            
-            // Get pathway data
-            const pathway = getCareerPathway(strand, dreamJob, moneyNeed, superpower, reality);
-            
-            // Update roadmap steps
-            document.getElementById('step1').textContent = pathway.steps.step1;
-            document.getElementById('step2').textContent = pathway.steps.step2;
-            document.getElementById('step3').textContent = pathway.steps.step3;
-            
-            // Update course recommendations
-            updateCourseRecommendations(pathway);
-            
-            // Update scores
-            updateScores(pathway);
-            
-            // Update pro tip
-            updateProTip(strand, dreamJob, reality, pathway);
-        }
+  // Add slight randomness to prevent same ordering always
+  score += Math.floor(Math.random()*6);
 
-        function getCareerPathway(strand, dreamJob, moneyNeed, superpower, reality) {
-            const strandData = careerDatabase[strand] || careerDatabase['Still Figuring It Out'];
-            const pathway = strandData.pathways[dreamJob] || strandData.pathways[Object.keys(strandData.pathways)[0]];
-            
-            // Adjust scores based on answers
-            let passionScore = pathway.demand;
-            const feeling = answers.q2 || '🙂 Chilling';
-            
-            if (feeling.includes('🤩')) passionScore += 15;
-            else if (feeling.includes('🙂')) passionScore += 5;
-            else if (feeling.includes('😐')) passionScore -= 5;
-            else if (feeling.includes('😩')) passionScore -= 15;
-            
-            // Adjust based on money needs
-            if (moneyNeed === 'High Roller') {
-                pathway.growth += 10;
-                pathway.balance -= 10;
-            } else if (moneyNeed === 'Passion First') {
-                passionScore += 10;
-                pathway.balance += 10;
-            } else if (moneyNeed === 'Survival Mode') {
-                pathway.demand += 5;
-                pathway.balance -= 5;
-            }
-            
-            // Adjust based on reality check
-            if (reality === 'Clear Plan') {
-                passionScore += 10;
-                pathway.growth += 5;
-            } else if (reality === 'Interests No Clue') {
-                pathway.balance += 10;
-            }
-            
-            // Ensure scores are within bounds
-            passionScore = Math.min(100, Math.max(50, passionScore));
-            pathway.demand = Math.min(100, Math.max(50, pathway.demand));
-            pathway.growth = Math.min(100, Math.max(50, pathway.growth));
-            pathway.balance = Math.min(100, Math.max(50, pathway.balance));
-            
-            return {
-                ...pathway,
-                passion: Math.round(passionScore)
-            };
-        }
+  return score;
+}
 
-        function updateCourseRecommendations(pathway) {
-            const container = document.getElementById('courseRecommendations');
-            container.innerHTML = '';
-            
-            pathway.topCourses.forEach((course, index) => {
-                const card = document.createElement('div');
-                card.className = 'course-card';
-                card.style.animationDelay = `${index * 0.2}s`;
-                
-                // Format schools with Gordon College highlighting
-                let schoolsHTML = course.schools.map(school => {
-                    if (school.includes('Gordon College')) {
-                        return `<li><i class="fas fa-star" style="color: #f59e0b;"></i> <strong>${school}</strong> ★ TOP PICK</li>`;
-                    }
-                    return `<li><i class="fas fa-school"></i> ${school}</li>`;
-                }).join('');
-                
-                // Format specializations
-                const specializations = course.specializations ? 
-                    `<div class="course-highlight">
-                        <strong>Specializations:</strong> ${course.specializations.join(', ')}
-                    </div>` : '';
-                
-                // Format certifications
-                const certifications = course.certifications ?
-                    `<p><strong>Certifications:</strong> ${course.certifications.join(', ')}</p>` : '';
-                
-                // Format scholarships
-                const scholarships = course.scholarships ?
-                    `<p><strong>Scholarships:</strong> ${course.scholarships.join(', ')}</p>` : '';
-                
-                card.innerHTML = `
-                    <div class="course-badge">#${course.rank} Recommendation</div>
-                    <div class="course-title">${course.name}</div>
-                    <div class="course-details">
-                        <p><strong>Duration:</strong> ${course.duration}</p>
-                        <p><strong>Cost:</strong> ${course.cost}</p>
-                        <p><strong>Entry Salary:</strong> ${course.entrySalary}</p>
-                        ${course.midCareer ? `<p><strong>Mid-Career:</strong> ${course.midCareer}</p>` : ''}
-                        <p><strong>Demand:</strong> ${course.demand}</p>
-                        <p><strong>Top Schools:</strong></p>
-                        <ul>${schoolsHTML}</ul>
-                        ${certifications}
-                        ${scholarships}
-                        ${specializations}
-                    </div>
-                `;
-                
-                container.appendChild(card);
-            });
-        }
+function pickSchools(topCourses){
+  const includeNearby = document.getElementById('includeNearby').checked;
+  const scored = schoolsDB
+    .map(s => ({...s, _score: computeSchoolScore(s, topCourses, includeNearby)}))
+    .filter(s => s._score > -1000)
+    .sort((a,b)=> b._score - a._score);
 
-        function updateScores(pathway) {
-            document.getElementById('passionScore').textContent = `${pathway.passion}%`;
-            document.getElementById('demandScore').textContent = `${pathway.demand}%`;
-            document.getElementById('growthScore').textContent = `${pathway.growth}%`;
-            document.getElementById('balanceScore').textContent = `${pathway.balance}%`;
-            
-            // Animate meter bars
-            setTimeout(() => {
-                document.getElementById('passionBar').style.width = `${pathway.passion}%`;
-                document.getElementById('demandBar').style.width = `${pathway.demand}%`;
-                document.getElementById('growthBar').style.width = `${pathway.growth}%`;
-                document.getElementById('balanceBar').style.width = `${pathway.balance}%`;
-            }, 300);
-        }
+  // wider choice: return 8-10 options
+  const pool = scored.slice(0, 12);
+  shuffleInPlace(pool);
+  return pool.slice(0, 10);
+}
 
-        function updateProTip(strand, dreamJob, reality, pathway) {
-            const tips = {
-                'STEM Squad': "TECH skills depreciate fast - commit to lifelong learning. Join GitHub, contribute to open source, and build a strong portfolio. Get AWS/Google Cloud certifications early for maximum earning potential.",
-                'HUMSS Hero': "NETWORK is everything in humanities. Build relationships with professors, join professional organizations like PRSP, and attend industry conferences. Consider government positions for stability.",
-                'ABM Hustler': "GET certified early (CPA, CFA, etc.). The Philippines has a shortage of 40,000 accountants. Consider working in audit firms for 2-3 years for best career launch and overseas opportunities.",
-                'TVL/Tech Master': "TESDA certifications are gold in overseas employment. Aim for NC III/NC IV and consider Japan's Technical Intern Training Program or Middle East opportunities. Specialize in high-demand skills.",
-                'Still Figuring It Out': "TRY before you commit. Take online courses in different fields on Coursera (free audits). Shadow professionals in 3 different industries this year. Remember that 65% of today's jobs didn't exist 10 years ago."
-            };
-            
-            let tip = tips[strand] || "BALANCE passion with practicality. The most successful careers often combine both! Consider double majors or minors to broaden your options and increase employability.";
-            
-            if (reality === 'Parents Plan') {
-                tip += " Have an HONEST conversation with your parents about your passions. Show them your research, backup plans, and success stories in your chosen field. Compromise with a practical major and passion minor.";
-            } else if (reality === 'Interests No Clue') {
-                tip += " Start with the DOLE Career Guide (free download). Take the Holland Code test online. Consider GENERAL EDUCATION courses first to explore before specializing.";
-            } else if (reality === 'Stable First') {
-                tip += " GOOD strategy! Consider government positions (career service eligibility), teaching (always in demand), healthcare (aging population = growing need), or accounting (consistent demand).";
-            }
-            
-            // Add Gordon College recommendation if in Region III
-            if (answers.region === 'Region III') {
-                tip += `\n\n🌟 <strong>REGIONAL ADVANTAGE:</strong> Since you're in Region III, consider <strong>Gordon College Olongapo</strong> - affordable quality education (₱15K/year) with strong industry ties and TESDA certifications!`;
-            }
-            
-            // Add financial advice based on money needs
-            const moneyNeed = answers.q5 || 'Comfortable';
-            if (moneyNeed === 'Survival Mode') {
-                tip += "\n\n💰 <strong>FINANCIAL STRATEGY:</strong> Consider TESDA programs (FREE) for quick employment. Target industries with immediate hiring: BPO, technical skills, healthcare support.";
-            } else if (moneyNeed === 'High Roller') {
-                tip += "\n\n💰 <strong>HIGH-EARNING PATHS:</strong> Focus on Computer Science, Accountancy (CPA), Engineering, or Medicine. Get international certifications and target multinational companies.";
-            }
-            
-            document.getElementById('proTip').innerHTML = tip;
-        }
+function computeCompanyScore(item, topCourses){
+  const direction = answers.q2 || "";
+  const style = answers.q4 || "";
+  const priority = answers.q3 || "";
+  let score = 0;
 
-        function showLocalOpportunities(region, city) {
-            const opportunities = localOpportunities[region];
-            const section = document.getElementById('opportunitySection');
-            
-            if (opportunities) {
-                section.style.display = 'block';
-                document.getElementById('locationName').textContent = `${city}, ${region}`;
-                
-                // Companies
-                const companiesList = document.getElementById('companiesList');
-                companiesList.innerHTML = opportunities.companies
-                    .map(company => `<li><i class="fas fa-building"></i> ${company}</li>`)
-                    .join('');
-                
-                // Schools - highlight Gordon College
-                const schoolsList = document.getElementById('schoolsList');
-                schoolsList.innerHTML = opportunities.schools
-                    .map(school => {
-                        if (school.includes('Gordon College')) {
-                            return `<li style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); padding: 10px; border-radius: 8px; border-left: 3px solid #f59e0b; margin: 5px 0;">
-                                <i class="fas fa-star" style="color: #f59e0b;"></i> 
-                                <strong>${school}</strong> 
-                                <span style="color: #f59e0b; font-size: 0.8rem;">★ HIGHLY RECOMMENDED</span>
-                            </li>`;
-                        }
-                        return `<li><i class="fas fa-school"></i> ${school}</li>`;
-                    })
-                    .join('');
-                
-                // Add Gordon College special section
-                if (region === 'Region III') {
-                    const gordonSection = document.createElement('div');
-                    gordonSection.className = 'course-highlight';
-                    gordonSection.style.marginTop = '15px';
-                    gordonSection.innerHTML = `
-                        <h5 style="color: #be185d; margin-bottom: 10px; font-size: 1rem;">
-                            <i class="fas fa-star" style="color: #f59e0b;"></i> 
-                            <strong>Why Gordon College Olongapo Stands Out:</strong>
-                        </h5>
-                        <ul style="font-size: 0.85rem;">
-                            <li>✅ <strong>Most Affordable:</strong> Only ₱15,000/year average tuition</li>
-                            <li>✅ <strong>TESDA Center On Campus:</strong> Free technical certifications</li>
-                            <li>✅ <strong>Strong Industry Links:</strong> 50+ company partnerships</li>
-                            <li>✅ <strong>High Employment Rate:</strong> 95% within 6 months graduation</li>
-                            <li>✅ <strong>Modern Facilities:</strong> Updated laboratories and equipment</li>
-                        </ul>
-                        <p style="margin-top: 10px; font-size: 0.85rem;">
-                            <strong>Contact:</strong> ${gordonCollegeInfo.contact} | 
-                            <strong>Website:</strong> ${gordonCollegeInfo.website}
-                        </p>
-                    `;
-                    schoolsList.parentNode.appendChild(gordonSection);
-                }
-                
-                // Training
-                const trainingList = document.getElementById('trainingList');
-                trainingList.innerHTML = opportunities.training
-                    .map(training => {
-                        if (training.includes('Gordon College')) {
-                            return `<li><i class="fas fa-star" style="color: #f59e0b;"></i> <strong>${training}</strong> ★</li>`;
-                        }
-                        return `<li><i class="fas fa-certificate"></i> ${training}</li>`;
-                    })
-                    .join('');
-            }
-        }
+  // match direction tag
+  if(item.fitTags.includes(direction)) score += 18;
+  // match learning style / priority
+  if(item.fitTags.includes(style)) score += 10;
+  if(item.fitTags.includes(priority)) score += 10;
 
-        function animateAllElements() {
-            // Animate roadmap steps
-            const steps = document.querySelectorAll('.roadmap-step');
-            steps.forEach((step, index) => {
-                setTimeout(() => {
-                    step.style.animation = 'fadeInUp 0.5s ease forwards';
-                }, index * 100);
-            });
-            
-            // Animate course cards
-            const cards = document.querySelectorAll('.course-card');
-            cards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.animation = 'fadeInUp 0.5s ease forwards';
-                }, index * 150);
-            });
-            
-            // Animate opportunity cards
-            const oppCards = document.querySelectorAll('.opportunity-card');
-            oppCards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.animation = 'fadeInUp 0.5s ease forwards';
-                }, index * 150);
-            });
-            
-            // Animate meters
-            const meters = document.querySelectorAll('.meter');
-            meters.forEach((meter, index) => {
-                setTimeout(() => {
-                    meter.style.animation = 'fadeInUp 0.5s ease forwards';
-                }, index * 100);
-            });
-        }
+  // if top course is SkilledTrades/Engineering, shipyard gets extra
+  const topHasTrades = topCourses.some(c=>c.tags.includes("SkilledTrades"));
+  const topHasEng = topCourses.some(c=>c.tags.includes("Engineering"));
+  if((topHasTrades || topHasEng) && item.name.toLowerCase().includes("shipyard")) score += 10;
 
-        function restartQuiz() {
-            // Reset state
-            currentQuestion = 1;
-            answers = {};
-            
-            // Reset selections
-            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
-            document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('selected'));
-            
-            // Reset inputs
-            document.getElementById('customJob').value = '';
-            document.getElementById('customJob').style.borderColor = '';
-            document.getElementById('regionSelect').value = '';
-            document.getElementById('cityInput').value = '';
-            document.getElementById('generateBtn').disabled = true;
-            
-            // Reset progress messages
-            document.querySelectorAll('.auto-progress-indicator').forEach(msg => {
-                msg.innerHTML = msg.innerHTML.includes('map-marker')
-                    ? '<i class="fas fa-map-marker-alt"></i> <span>Fill both fields to continue</span>'
-                    : '<i class="fas fa-hand-point-up"></i> <span>Select an option to continue</span>';
-                msg.style.color = '#ec4899';
-            });
-            
-            // Show first question
-            document.querySelectorAll('.question-card').forEach(card => card.classList.remove('active'));
-            document.getElementById('question1').classList.add('active');
-            
-            // Show quiz section
-            document.getElementById('quizSection').style.display = 'block';
-            document.getElementById('resultSection').style.display = 'none';
-            
-            // Reset progress bar
-            updateProgressBar();
-        }
+  score += Math.floor(Math.random()*5);
+  return score;
+}
 
-        // Touch device optimizations
-        document.addEventListener('touchstart', function() {}, {passive: true});
-    </script>
+function pickCompanies(topCourses){
+  const scored = industryDB
+    .map(x => ({...x, _score: computeCompanyScore(x, topCourses)}))
+    .sort((a,b)=> b._score - a._score);
+  return scored.slice(0, 5);
+}
+
+/* -----------------------------
+   RESULT GENERATION
+--------------------------------*/
+function generateRoadmap(){
+  const barangay = document.getElementById('barangay').value;
+  if(!barangay){
+    alert("Please select your barangay.");
+    return;
+  }
+
+  // Ensure Q7 exists (if user didn't tap, default)
+  if(!answers.q7) answers.q7 = "TopCourses";
+
+  document.getElementById('quizSection').style.display = 'none';
+  document.getElementById('resultSection').style.display = 'block';
+
+  const includeNearby = document.getElementById('includeNearby').checked;
+
+  // subtitle
+  document.getElementById('resultSubtitle').textContent =
+    includeNearby ? `Personalized for ${barangay}, Olongapo (with nearby/specialized options)` : `Personalized for ${barangay}, Olongapo City`;
+
+  const topCourses = pickTopCourses();
+  renderCourses(topCourses);
+  renderSchools(pickSchools(topCourses), topCourses);
+  renderCompanies(pickCompanies(topCourses), topCourses);
+}
+
+function renderCourses(topCourses){
+  const direction = answers.q2 || "";
+  const priority = answers.q3 || "";
+  const style = answers.q4 || "";
+
+  const summary = `
+    Based on your answers, your best matches balance <strong>${direction || "your direction"}</strong>,
+    <strong>${priority || "your priority"}</strong>, and a <strong>${style || "learning style"}</strong> approach.
+    Here are 3 strong course tracks to explore (with roles + why they fit).
+  `;
+  document.getElementById('courseSummary').innerHTML = summary;
+
+  const container = document.getElementById('courseCards');
+  container.innerHTML = "";
+
+  topCourses.forEach((c, idx)=>{
+    const card = document.createElement('div');
+    card.className = "course-card";
+    const roles = (c.sampleRoles || []).map(r=>`<li><i class="fa-solid fa-briefcase"></i> ${r}</li>`).join("");
+    const certs = (c.certifications || []).map(x=>`<li><i class="fa-solid fa-certificate"></i> ${x}</li>`).join("");
+
+    card.innerHTML = `
+      <div class="course-title">
+        <span>${c.id}</span>
+        <span class="badge">Top #${idx+1}</span>
+      </div>
+      <div class="muted">${c.desc}</div>
+      <div style="margin-top:10px;" class="muted"><strong>Example roles:</strong></div>
+      <ul class="list" style="margin-top:8px;">${roles || `<li><i class="fa-solid fa-briefcase"></i> Entry roles vary by school and training</li>`}</ul>
+      <div style="margin-top:10px;" class="muted"><strong>Useful starter training/certs:</strong></div>
+      <ul class="list" style="margin-top:8px;">${certs || `<li><i class="fa-solid fa-certificate"></i> Start with foundational training relevant to your track</li>`}</ul>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderSchools(schools, topCourses){
+  const list = document.getElementById('schoolsList');
+  list.innerHTML = "";
+
+  // If user chose "More school choices", increase list a bit
+  const mode = answers.q7 || "TopCourses";
+  const maxItems = (mode === "SchoolOptions") ? 12 : 10;
+  const shown = schools.slice(0, maxItems);
+
+  shown.forEach(s=>{
+    const li = document.createElement('li');
+    const tierLabel = s.nearbyTier === 0 ? "Olongapo" : (s.nearbyTier === 1 ? "Near Olongapo" : "Nearby/Specialized");
+    const strengths = s.strengths.join(", ");
+
+    const linkPart = s.website
+      ? `<div class="muted" style="margin-top:6px;"><a href="${s.website}" target="_blank" rel="noopener">Official website</a></div>`
+      : `<div class="muted" style="margin-top:6px;">Official website: <em>not linked here (verify via official pages)</em></div>`;
+
+    li.innerHTML = `
+      <div style="display:flex; gap:10px;">
+        <div style="min-width:28px; display:flex; justify-content:center; padding-top:2px;">
+          <i class="fa-solid fa-school" style="color:#6d28d9;"></i>
+        </div>
+        <div>
+          <div style="font-weight:950; color:#111827;">${s.name}</div>
+          <div class="muted"><strong>Area:</strong> ${tierLabel} • <strong>Type:</strong> ${s.type}</div>
+          <div class="muted"><strong>Why it fits:</strong> Offers strengths aligned to your tracks (e.g., ${strengths}).</div>
+          ${linkPart}
+        </div>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function renderCompanies(companies, topCourses){
+  const list = document.getElementById('companiesList');
+  list.innerHTML = "";
+
+  const mode = answers.q7 || "TopCourses";
+  const maxItems = (mode === "WorkAndSkills") ? 6 : 4;
+  companies.slice(0, maxItems).forEach(c=>{
+    const li = document.createElement('li');
+    const link = c.link ? `<a href="${c.link}" target="_blank" rel="noopener">Official/Reference link</a>` : `<span class="muted"><em>Link not included</em></span>`;
+
+    li.innerHTML = `
+      <div style="display:flex; gap:10px;">
+        <div style="min-width:28px; display:flex; justify-content:center; padding-top:2px;">
+          <i class="fa-solid fa-building" style="color:#be185d;"></i>
+        </div>
+        <div>
+          <div style="font-weight:950; color:#111827;">${c.name}</div>
+          <div class="muted"><strong>Why it matches your inputs:</strong> ${c.why}</div>
+          <div class="muted" style="margin-top:6px;">${link}</div>
+        </div>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+}
+
+/* -----------------------------
+   UTIL
+--------------------------------*/
+function shuffleInPlace(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function restartQuiz(){
+  currentQuestion = 1;
+  answers = {};
+
+  document.querySelectorAll('.question-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('question1').classList.add('active');
+
+  document.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('courseInterest').value = "";
+  document.getElementById('barangay').value = "";
+  document.getElementById('includeNearby').checked = false;
+
+  document.getElementById('quizSection').style.display = 'block';
+  document.getElementById('resultSection').style.display = 'none';
+
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('generateBtn').style.opacity = "0.6";
+  document.getElementById('locationIndicator').innerHTML = `<span class="chip"><i class="fa-solid fa-location-dot"></i> Select barangay to continue</span><span></span>`;
+
+  updateProgressBar();
+}
+</script>
 </body>
 </html>
