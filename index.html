@@ -519,11 +519,129 @@
         </div>
       </div>
 
-      <!-- Q5 -->
+      <!-- Q5 (REVISED: dropdown 50+ courses) -->
       <div class="question-card" id="question5">
         <div class="question-number">Question 5 of 7</div>
         <h2 class="question-text">Any specific course you’re considering?</h2>
-        <input class="input-field" id="courseInterest" placeholder="Type a course/keyword (e.g., Nursing, IT, Engineering, Accountancy)…" oninput="saveTypedCourse()" />
+
+        <select class="input-field" id="courseSelect" onchange="saveSelectedCourse()">
+          <option value="">-- Select a Course (Optional) --</option>
+
+          <optgroup label="Business & Finance">
+            <option>Accountancy</option>
+            <option>Accounting Information Systems</option>
+            <option>Business Administration</option>
+            <option>Financial Management</option>
+            <option>Banking and Finance</option>
+            <option>Entrepreneurship</option>
+            <option>Management Accounting</option>
+            <option>Marketing Management</option>
+            <option>Human Resource Management</option>
+            <option>Operations Management</option>
+            <option>Business Analytics</option>
+            <option>Economics</option>
+            <option>Public Administration</option>
+            <option>Office Administration</option>
+            <option>Logistics and Supply Chain Management</option>
+          </optgroup>
+
+          <optgroup label="Tech & Computing">
+            <option>Information Technology (IT)</option>
+            <option>Computer Science (CS)</option>
+            <option>Information Systems</option>
+            <option>Cybersecurity</option>
+            <option>Data Science</option>
+            <option>Computer Engineering</option>
+            <option>Software Engineering</option>
+            <option>Web Development</option>
+            <option>Mobile App Development</option>
+            <option>Network Administration</option>
+            <option>Cloud Computing</option>
+            <option>Game Development</option>
+            <option>Artificial Intelligence</option>
+            <option>Multimedia Computing</option>
+          </optgroup>
+
+          <optgroup label="Engineering & Aviation">
+            <option>Electronics Engineering (ECE)</option>
+            <option>Electrical Engineering (EE)</option>
+            <option>Mechanical Engineering (ME)</option>
+            <option>Civil Engineering (CE)</option>
+            <option>Industrial Engineering (IE)</option>
+            <option>Mechatronics Engineering</option>
+            <option>Biomedical Engineering</option>
+            <option>Aeronautical Engineering</option>
+            <option>Aviation Maintenance Technology</option>
+            <option>Avionics Technology</option>
+            <option>Aerospace Technology</option>
+            <option>Marine Engineering</option>
+            <option>Architecture</option>
+            <option>Geodetic Engineering</option>
+          </optgroup>
+
+          <optgroup label="Health & Allied Care">
+            <option>Nursing</option>
+            <option>Medical Technology / MedTech</option>
+            <option>Pharmacy</option>
+            <option>Physical Therapy</option>
+            <option>Occupational Therapy</option>
+            <option>Radiologic Technology</option>
+            <option>Respiratory Therapy</option>
+            <option>Midwifery</option>
+            <option>Public Health</option>
+            <option>Nutrition and Dietetics</option>
+            <option>Biology (Pre-med track)</option>
+            <option>Psychology (Clinical track)</option>
+          </optgroup>
+
+          <optgroup label="Education & Community">
+            <option>Elementary Education</option>
+            <option>Secondary Education</option>
+            <option>Special Needs Education</option>
+            <option>Early Childhood Education</option>
+            <option>Physical Education</option>
+            <option>Social Work</option>
+            <option>Guidance and Counseling</option>
+            <option>Political Science</option>
+            <option>Criminology</option>
+            <option>International Studies</option>
+            <option>Communication</option>
+          </optgroup>
+
+          <optgroup label="Creative & Media">
+            <option>Multimedia Arts</option>
+            <option>Graphic Design</option>
+            <option>Film and Video Production</option>
+            <option>Broadcasting</option>
+            <option>Journalism</option>
+            <option>Advertising Arts</option>
+            <option>Animation</option>
+            <option>Fashion Design</option>
+            <option>Interior Design</option>
+            <option>Fine Arts</option>
+          </optgroup>
+
+          <optgroup label="Hospitality & Tourism">
+            <option>Hospitality Management</option>
+            <option>Tourism Management</option>
+            <option>Culinary Arts</option>
+            <option>Travel Management</option>
+            <option>Event Management</option>
+            <option>Hotel and Restaurant Management</option>
+          </optgroup>
+
+          <optgroup label="Skilled Trades / TVET">
+            <option>TESDA: Electrical Installation & Maintenance (EIM)</option>
+            <option>TESDA: Shielded Metal Arc Welding (SMAW)</option>
+            <option>TESDA: Plumbing</option>
+            <option>TESDA: Automotive Servicing</option>
+            <option>TESDA: Computer Systems Servicing (CSS)</option>
+            <option>TESDA: Refrigeration & Air Conditioning</option>
+            <option>TESDA: Machining</option>
+            <option>TESDA: Bread and Pastry Production</option>
+          </optgroup>
+        </select>
+
         <div class="options-grid">
           <button class="option-btn" onclick="selectAndProgress(5, 'NoSpecific', this)">
             <i class="fa-solid fa-circle-question" style="color:#a21caf; margin-right:8px;"></i>
@@ -531,9 +649,10 @@
           </button>
           <button class="option-btn" onclick="selectAndProgress(5, 'HasSpecific', this)">
             <i class="fa-solid fa-crosshairs" style="color:#a21caf; margin-right:8px;"></i>
-            I have something in mind <small>Use my typed course/keyword</small>
+            Use the selected course <small>We’ll recommend closely related tracks only</small>
           </button>
         </div>
+
         <div class="nav-buttons">
           <button class="nav-btn btn-back" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> Back</button>
         </div>
@@ -610,7 +729,6 @@
           <button class="nav-btn btn-back" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> Back</button>
         </div>
       </div>
-
     </div>
 
     <!-- RESULTS -->
@@ -758,10 +876,8 @@ const courseCatalog = [
 
 /* -----------------------------
    DATA: SCHOOLS (Olongapo + nearby)
-   Note: include official websites where known.
 --------------------------------*/
 const schoolsDB = [
-  // Olongapo City
   { name:"Gordon College (Olongapo)", city:"Olongapo", area:"Olongapo", type:"Public", nearbyTier:0,
     strengths:["IT","Business","Education","Industrial Tech","TVET ladderized"],
     website:"https://gordoncollege.edu.ph/w3/" },
@@ -772,7 +888,6 @@ const schoolsDB = [
     strengths:["Education","Business","Health-related (varies)","Community programs"],
     website:"https://www.sjc-o.com/" },
 
-  // Subic / Freeport (near Olongapo)
   { name:"The Manila Times College of Subic", city:"Subic Bay Freeport Zone", area:"Near Olongapo", type:"Private", nearbyTier:1,
     strengths:["Communication/Media","Business","Work-based learning"],
     website:"https://tmtc.edu.ph/" },
@@ -780,12 +895,10 @@ const schoolsDB = [
     strengths:["Business","Hospitality","Education (varies)","Basic to College"],
     website:"" },
 
-  // Zambales / Region III near
   { name:"President Ramon Magsaysay State University (PRMSU)", city:"Zambales", area:"Nearby (Zambales)", type:"Public SUC", nearbyTier:2,
     strengths:["Engineering","Education","IT","Agriculture/Environment (varies by campus)"],
     website:"https://www.prmsu.edu.ph/" },
 
-  // Bataan / Pampanga / nearby
   { name:"Bataan Peninsula State University (BPSU)", city:"Bataan", area:"Nearby (Bataan)", type:"Public SUC", nearbyTier:2,
     strengths:["Engineering","IT","Business","Education (varies by campus)"],
     website:"https://www.bpsu.edu.ph/" },
@@ -875,8 +988,9 @@ function updateProgressBar(){
   document.getElementById('progressFill').style.width = `${progress}%`;
 }
 
-function saveTypedCourse(){
-  answers.typedCourse = document.getElementById('courseInterest').value.trim();
+function saveSelectedCourse(){
+  const v = document.getElementById('courseSelect').value;
+  answers.typedCourse = (v || "").trim(); // reuse the same variable name to keep logic intact
 }
 
 function checkLocationComplete(){
@@ -897,13 +1011,40 @@ function checkLocationComplete(){
 
 /* -----------------------------
    SCORING / RECOMMENDATION LOGIC
+   (strict typed-course matching, no random shuffle)
 --------------------------------*/
 function normalizeText(s){
   return (s || "").toLowerCase().trim();
 }
 
-function hasAnyTag(course, tags){
-  return tags.some(t => course.tags.includes(t));
+function getMainCategory(tags){
+  const mains = ["Health","Tech","Engineering","Business","Education","Creative","SkilledTrades"];
+  return tags.find(t => mains.includes(t)) || "Other";
+}
+
+function keywordMatchScore(hay, typed){
+  if(!typed) return 0;
+  if(hay === typed) return 120;
+  if(hay.includes(typed)) return 90;
+  const words = typed.split(/\s+/).filter(Boolean);
+  let hits = 0;
+  for(const w of words){
+    if(w.length >= 3 && hay.includes(w)) hits++;
+  }
+  return hits ? (40 + hits * 10) : 0;
+}
+
+function findTypedMatches(){
+  const typed = normalizeText(answers.typedCourse || "");
+  if(typed.length < 2) return [];
+
+  return courseCatalog
+    .map(c => {
+      const hay = normalizeText(c.id + " " + (c.desc || "") + " " + (c.tags || []).join(" "));
+      return { c, m: keywordMatchScore(hay, typed) };
+    })
+    .filter(x => x.m > 0)
+    .sort((a,b)=> b.m - a.m);
 }
 
 function computeCourseScore(course){
@@ -913,65 +1054,61 @@ function computeCourseScore(course){
   const style = answers.q4 || "";
   const typedMode = answers.q5 || "NoSpecific";
   const typed = normalizeText(answers.typedCourse || "");
+
   let score = 0;
 
-  // Strand affinity
   if(course.shs.includes(strand)) score += 16;
   if(strand === "TVL" && course.tags.includes("SkilledTrades")) score += 10;
   if(strand === "STEM" && (course.tags.includes("Tech") || course.tags.includes("Engineering") || course.tags.includes("Health"))) score += 8;
   if(strand === "ABM" && course.tags.includes("Business")) score += 8;
 
-  // Direction match
-  score += course.tags.includes(direction) ? 22 : 0;
+  if(direction) score += course.tags.includes(direction) ? 22 : -6;
 
-  // Priority
-  score += course.tags.includes(priority) ? 14 : 0;
+  if(priority) score += course.tags.includes(priority) ? 14 : 0;
+  if(style) score += course.tags.includes(style) ? 10 : 0;
 
-  // Learning style
-  score += course.tags.includes(style) ? 10 : 0;
-
-  // Typed keyword boost
   if(typedMode === "HasSpecific" && typed.length >= 2){
     const hay = normalizeText(course.id + " " + course.desc + " " + course.tags.join(" "));
-    if(hay.includes(typed)) score += 28;
+    const km = keywordMatchScore(hay, typed);
+    score += km;
+    if(km < 70) score -= 20;
   }
-
-  // Mild diversity: don’t let the same few always dominate
-  score += Math.floor(Math.random() * 6); // 0..5
 
   return score;
 }
 
 function pickTopCourses(){
+  const typedMode = answers.q5 || "NoSpecific";
+  const typed = normalizeText(answers.typedCourse || "");
+
+  if(typedMode === "HasSpecific" && typed.length >= 2){
+    const matches = findTypedMatches();
+    if(matches.length){
+      const topMatch = matches[0].c;
+      const lockedMain = getMainCategory(topMatch.tags);
+
+      const related = courseCatalog
+        .filter(c => getMainCategory(c.tags) === lockedMain)
+        .map(c => ({...c, _score: computeCourseScore(c)}))
+        .sort((a,b)=> b._score - a._score);
+
+      const result = [];
+      const exact = related.find(x => x.id === topMatch.id);
+      if(exact) result.push(exact);
+
+      for(const c of related){
+        if(result.length >= 3) break;
+        if(!result.some(r => r.id === c.id)) result.push(c);
+      }
+      return result.slice(0,3);
+    }
+  }
+
   const scored = courseCatalog
     .map(c => ({...c, _score: computeCourseScore(c)}))
     .sort((a,b)=> b._score - a._score);
 
-  // Take top pool then shuffle slightly to reduce repetition
-  const pool = scored.slice(0, 8);
-  shuffleInPlace(pool);
-
-  // Ensure variety: at least 2 different main categories if possible
-  const picked = [];
-  const usedDirections = new Set();
-  for(const c of pool){
-    const main = c.tags.find(t => ["Health","Tech","Engineering","Business","Education","Creative","SkilledTrades"].includes(t)) || "Other";
-    if(picked.length < 3){
-      if(picked.length < 2){
-        if(!usedDirections.has(main)){
-          picked.push(c); usedDirections.add(main);
-        }
-      }else{
-        picked.push(c);
-      }
-    }
-  }
-  // Fallback if not enough
-  while(picked.length < 3 && pool.length){
-    const c = pool.shift();
-    if(!picked.some(x=>x.id===c.id)) picked.push(c);
-  }
-  return picked.slice(0,3);
+  return scored.slice(0,3);
 }
 
 function computeSchoolScore(school, topCourses, includeNearby){
@@ -981,54 +1118,41 @@ function computeSchoolScore(school, topCourses, includeNearby){
   const typed = normalizeText(answers.typedCourse || "");
   let score = 0;
 
-  // Tier weight (0 = Olongapo; 1 = near; 2-3 = farther)
-  if(!includeNearby && school.nearbyTier > 0) return -9999; // hard exclude
+  if(!includeNearby && school.nearbyTier > 0) return -9999;
 
-  // base: prefer Olongapo always
   score += (school.nearbyTier === 0) ? 30 : (school.nearbyTier === 1 ? 18 : (includeNearby ? 10 : 0));
 
-  // Match strengths to top courses
   const courseNames = topCourses.map(c=>normalizeText(c.id));
   const strengths = school.strengths.map(s=>normalizeText(s));
   courseNames.forEach(name=>{
     if(strengths.some(st => st.includes(name.split(" ")[0]))) score += 14;
   });
 
-  // Direction alignment
   if(direction === "Health" && strengths.some(s=>s.includes("nurs") || s.includes("health"))) score += 12;
   if(direction === "Tech" && strengths.some(s=>s.includes("it") || s.includes("cs"))) score += 12;
   if(direction === "Engineering" && strengths.some(s=>s.includes("eng") || s.includes("avi"))) score += 12;
-  if(direction === "Business" && strengths.some(s=>s.includes("bus"))) score += 12;
+  if(direction === "Business" && strengths.some(s=>s.includes("bus") || s.includes("account"))) score += 12;
   if(direction === "Education" && strengths.some(s=>s.includes("educ"))) score += 12;
   if(direction === "Creative" && strengths.some(s=>s.includes("comm") || s.includes("arts"))) score += 12;
   if(direction === "SkilledTrades" && strengths.some(s=>s.includes("tvet") || s.includes("industrial"))) score += 12;
 
-  // Priority tweak
   if(priority === "FastTrack" && strengths.some(s=>s.includes("tvet") || s.includes("industrial"))) score += 10;
 
-  // Typed keyword mild boost
   if(typedMode === "HasSpecific" && typed.length >= 2){
     const hay = normalizeText(school.name + " " + school.strengths.join(" "));
     if(hay.includes(typed)) score += 10;
   }
-
-  // Add slight randomness to prevent same ordering always
-  score += Math.floor(Math.random()*6);
 
   return score;
 }
 
 function pickSchools(topCourses){
   const includeNearby = document.getElementById('includeNearby').checked;
-  const scored = schoolsDB
+  return schoolsDB
     .map(s => ({...s, _score: computeSchoolScore(s, topCourses, includeNearby)}))
     .filter(s => s._score > -1000)
-    .sort((a,b)=> b._score - a._score);
-
-  // wider choice: return 8-10 options
-  const pool = scored.slice(0, 12);
-  shuffleInPlace(pool);
-  return pool.slice(0, 10);
+    .sort((a,b)=> b._score - a._score)
+    .slice(0, 10);
 }
 
 function computeCompanyScore(item, topCourses){
@@ -1037,26 +1161,22 @@ function computeCompanyScore(item, topCourses){
   const priority = answers.q3 || "";
   let score = 0;
 
-  // match direction tag
   if(item.fitTags.includes(direction)) score += 18;
-  // match learning style / priority
   if(item.fitTags.includes(style)) score += 10;
   if(item.fitTags.includes(priority)) score += 10;
 
-  // if top course is SkilledTrades/Engineering, shipyard gets extra
   const topHasTrades = topCourses.some(c=>c.tags.includes("SkilledTrades"));
   const topHasEng = topCourses.some(c=>c.tags.includes("Engineering"));
   if((topHasTrades || topHasEng) && item.name.toLowerCase().includes("shipyard")) score += 10;
 
-  score += Math.floor(Math.random()*5);
   return score;
 }
 
 function pickCompanies(topCourses){
-  const scored = industryDB
+  return industryDB
     .map(x => ({...x, _score: computeCompanyScore(x, topCourses)}))
-    .sort((a,b)=> b._score - a._score);
-  return scored.slice(0, 5);
+    .sort((a,b)=> b._score - a._score)
+    .slice(0, 5);
 }
 
 /* -----------------------------
@@ -1069,7 +1189,6 @@ function generateRoadmap(){
     return;
   }
 
-  // Ensure Q7 exists (if user didn't tap, default)
   if(!answers.q7) answers.q7 = "TopCourses";
 
   document.getElementById('quizSection').style.display = 'none';
@@ -1077,7 +1196,6 @@ function generateRoadmap(){
 
   const includeNearby = document.getElementById('includeNearby').checked;
 
-  // subtitle
   document.getElementById('resultSubtitle').textContent =
     includeNearby ? `Personalized for ${barangay}, Olongapo (with nearby/specialized options)` : `Personalized for ${barangay}, Olongapo City`;
 
@@ -1091,11 +1209,16 @@ function renderCourses(topCourses){
   const direction = answers.q2 || "";
   const priority = answers.q3 || "";
   const style = answers.q4 || "";
+  const typedMode = answers.q5 || "NoSpecific";
+  const typed = (answers.typedCourse || "").trim();
 
   const summary = `
-    Based on your answers, your best matches balance <strong>${direction || "your direction"}</strong>,
-    <strong>${priority || "your priority"}</strong>, and a <strong>${style || "learning style"}</strong> approach.
-    Here are 3 strong course tracks to explore (with roles + why they fit).
+    ${typedMode === "HasSpecific" && typed
+      ? `You selected <strong>${typed}</strong>, so we kept your recommendations <strong>aligned to that track</strong> (no random shifting).`
+      : `Based on your answers, your best matches balance <strong>${direction || "your direction"}</strong>,
+         <strong>${priority || "your priority"}</strong>, and a <strong>${style || "learning style"}</strong> approach.`
+    }
+    <br/>Here are 3 strong course tracks to explore (with roles + why they fit).
   `;
   document.getElementById('courseSummary').innerHTML = summary;
 
@@ -1127,7 +1250,6 @@ function renderSchools(schools, topCourses){
   const list = document.getElementById('schoolsList');
   list.innerHTML = "";
 
-  // If user chose "More school choices", increase list a bit
   const mode = answers.q7 || "TopCourses";
   const maxItems = (mode === "SchoolOptions") ? 12 : 10;
   const shown = schools.slice(0, maxItems);
@@ -1184,16 +1306,6 @@ function renderCompanies(companies, topCourses){
   });
 }
 
-/* -----------------------------
-   UTIL
---------------------------------*/
-function shuffleInPlace(arr){
-  for(let i=arr.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
-
 function restartQuiz(){
   currentQuestion = 1;
   answers = {};
@@ -1202,7 +1314,8 @@ function restartQuiz(){
   document.getElementById('question1').classList.add('active');
 
   document.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById('courseInterest').value = "";
+  const cs = document.getElementById('courseSelect');
+  if(cs) cs.value = "";
   document.getElementById('barangay').value = "";
   document.getElementById('includeNearby').checked = false;
 
