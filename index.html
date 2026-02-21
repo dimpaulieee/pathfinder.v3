@@ -876,11 +876,12 @@ const courseCatalog = [
 
 /* -----------------------------
    DATA: SCHOOLS (Olongapo + nearby + Manila Big 4)
+   ✅ Gordon College updated to include Nursing/Health in strengths.
 --------------------------------*/
 const schoolsDB = [
   // Olongapo City
   { name:"Gordon College (Olongapo)", city:"Olongapo", area:"Olongapo", type:"Public", nearbyTier:0,
-    strengths:["IT","Business","Education","Industrial Tech","TVET ladderized"],
+    strengths:["Nursing","Health","IT","Business","Education","Industrial Tech","TVET ladderized"],
     website:"https://gordoncollege.edu.ph/w3/" },
   { name:"Columban College, Inc. (Olongapo)", city:"Olongapo", area:"Olongapo", type:"Private", nearbyTier:0,
     strengths:["Nursing/Health (varies by offering)","Business","Education","Arts/Comm"],
@@ -924,7 +925,6 @@ const schoolsDB = [
 
 /* -----------------------------
    DATA: OPPORTUNITIES (must include ALL directions)
-   We will always render 1 item per direction, plus a couple extras that fit the user.
 --------------------------------*/
 const opportunitiesByDirection = [
   {
@@ -978,7 +978,6 @@ const opportunitiesByDirection = [
   },
 ];
 
-// Optional extras (shown depending on user choices)
 const extrasDB = [
   {
     fitDirections:["Engineering","SkilledTrades"],
@@ -1171,13 +1170,10 @@ function computeSchoolScore(school, topCourses, includeOutside){
   const typed = normalizeText(answers.typedCourse || "");
   let score = 0;
 
-  // only show outside schools (tiers > 0) if includeOutside is checked
   if(!includeOutside && school.nearbyTier > 0) return -9999;
 
-  // base preference: Olongapo first, then near, then manila
   score += (school.nearbyTier === 0) ? 34 : (school.nearbyTier === 1 ? 22 : (school.nearbyTier === 2 ? 14 : (school.nearbyTier === 3 ? 12 : 10)));
 
-  // Match strengths to top courses (simple)
   const courseNames = topCourses.map(c=>normalizeText(c.id));
   const strengths = school.strengths.map(s=>normalizeText(s));
   courseNames.forEach(name=>{
@@ -1185,7 +1181,6 @@ function computeSchoolScore(school, topCourses, includeOutside){
     if(strengths.some(st => st.includes(key))) score += 14;
   });
 
-  // Direction alignment
   if(direction === "Health" && strengths.some(s=>s.includes("health") || s.includes("nurs"))) score += 12;
   if(direction === "Tech" && strengths.some(s=>s.includes("tech") || s.includes("it") || s.includes("cs"))) score += 12;
   if(direction === "Engineering" && strengths.some(s=>s.includes("engineering") || s.includes("aviation"))) score += 12;
@@ -1200,13 +1195,20 @@ function computeSchoolScore(school, topCourses, includeOutside){
     if(hay.includes(typed)) score += 10;
   }
 
+  // ✅ HARD PRIORITY: If Nursing is selected/targeted, Gordon College becomes #1
+  const typedIsNursing = (typedMode === "HasSpecific" && typed.includes("nurs"));
+  const topHasNursing = topCourses.some(c => normalizeText(c.id).includes("nurs"));
+  if (typedIsNursing || topHasNursing) {
+    const isGC = normalizeText(school.name).includes("gordon college");
+    if (isGC) score += 200;
+    else score -= 10;
+  }
+
   return score;
 }
 
 function pickSchools(topCourses){
   const includeOutside = document.getElementById('includeNearby').checked;
-
-  // If outside is enabled, allow up to 12 (so Big 4 can appear too)
   const limit = includeOutside ? 12 : 10;
 
   return schoolsDB
@@ -1225,16 +1227,13 @@ function buildOpportunities(topCourses){
   const priority = answers.q3 || "";
   const mode = answers.q7 || "TopCourses";
 
-  // Base list: 1 per direction (always)
   const base = opportunitiesByDirection.map(x => ({...x}));
 
-  // Add 1-2 extras if relevant (mode WorkAndSkills shows more)
   const extras = extrasDB
     .filter(e => (e.fitDirections || []).includes(direction) || (e.fitDirections || []).includes(getMainCategory(topCourses[0]?.tags || [])))
     .slice(0, (mode === "WorkAndSkills") ? 2 : 1)
     .map(e => ({ direction:"Extra", icon:e.icon, name:e.name, why:e.why, link:e.link }));
 
-  // A small "why based on you" note per base item (without changing the guaranteed coverage)
   base.forEach(item=>{
     let add = [];
     if(item.direction === direction) add.push("matches your chosen direction");
@@ -1321,6 +1320,9 @@ function renderSchools(schools, topCourses){
   const maxItems = (mode === "SchoolOptions") ? 12 : schools.length;
   const shown = schools.slice(0, maxItems);
 
+  const typed = normalizeText(answers.typedCourse || "");
+  const nursingMode = (answers.q5 === "HasSpecific" && typed.includes("nurs"));
+
   shown.forEach(s=>{
     const li = document.createElement('li');
     const tierLabel =
@@ -1330,6 +1332,10 @@ function renderSchools(schools, topCourses){
       "Outside Olongapo";
 
     const strengths = s.strengths.join(", ");
+
+    const nursingBadge = (nursingMode && normalizeText(s.name).includes("gordon college"))
+      ? `<span class="badge" style="margin-top:8px; display:inline-block;">Top Pick for Nursing</span>`
+      : "";
 
     const linkPart = s.website
       ? `<div class="muted" style="margin-top:6px;"><a href="${s.website}" target="_blank" rel="noopener">Official website</a></div>`
@@ -1342,6 +1348,7 @@ function renderSchools(schools, topCourses){
         </div>
         <div>
           <div style="font-weight:950; color:#111827;">${s.name}</div>
+          ${nursingBadge}
           <div class="muted"><strong>Area:</strong> ${tierLabel} • <strong>Type:</strong> ${s.type}</div>
           <div class="muted"><strong>Why it fits:</strong> Strengths aligned to your tracks (e.g., ${strengths}).</div>
           ${linkPart}
@@ -1357,7 +1364,7 @@ function renderOpportunities(items){
   list.innerHTML = "";
 
   const mode = answers.q7 || "TopCourses";
-  const maxItems = (mode === "WorkAndSkills") ? 10 : 9; // 7 guaranteed + up to 2 extras
+  const maxItems = (mode === "WorkAndSkills") ? 10 : 9;
   items.slice(0, maxItems).forEach(c=>{
     const li = document.createElement('li');
     const link = c.link
